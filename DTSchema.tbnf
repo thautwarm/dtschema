@@ -41,16 +41,14 @@ definition : def-record   { $1 }
 
 def-extern : 'extern' 'type' <IDENTIFIER> { DefExtern(getPos($1), lexeme($3)) }
 
-def-record : 'data' ctor { DefRecord(getPos($1), $2) }
+def-record : 'type' ctor { DefRecord(getPos($1), $2) }
 
 optional-annotation : '?' ':' { true } | ':' { false }
 
 fieldname : <IDENTIFIER> { lexeme($1) }
-          | 'data'       { "data" }
           | 'fn'         { "fn" }
           | 'type'       { "type" }
           | 'extern'     { "extern" }
-          | 'variant'    { "variant" }
 
 field : fieldname optional-annotation def-typ { Field($1, $3, $2) }
 
@@ -59,7 +57,7 @@ ctor : <IDENTIFIER> '(' seplist(',', field)  ')' { Ctor(lexeme($1), $3) }
 
 constructor: '|' ctor { $2 }
 
-def-sort : 'variant' <IDENTIFIER> '=' list(constructor) { DefSort(getPos($1), Sort(lexeme($2), $4)) }
+def-sort : 'type' <IDENTIFIER> '=' list(constructor) { DefSort(getPos($1), Sort(lexeme($2), $4)) }
 
 def-typ : '[' seplist(',', def-typ) ']'                       { select(notSingular($2), TyTuple($2), TyList(firstElt($2))) }
         | '{' def-typ ':' def-typ '}'                         { TyMap($2, $4) }

@@ -78,7 +78,7 @@ def_t_extern returns [Def result]
             }
 ;
 def_t_record returns [Def result]
-: def_t_record_0__1='data' def_t_record_0__2=ctor { $result = (Def) DefRecord((Pos) (Pos) getPos((IToken) _localctx.def_t_record_0__1), (Ctor) _localctx.def_t_record_0__2.result);
+: def_t_record_0__1='type' def_t_record_0__2=ctor { $result = (Def) DefRecord((Pos) (Pos) getPos((IToken) _localctx.def_t_record_0__1), (Ctor) _localctx.def_t_record_0__2.result);
             }
 ;
 optional_t_annotation returns [bool result]
@@ -90,15 +90,11 @@ optional_t_annotation returns [bool result]
 fieldname returns [string result]
 : fieldname_0__1=IDENTIFIER { $result = (string) lexeme((IToken) _localctx.fieldname_0__1);
             }
-| 'data' { $result = "data";
-            }
 | 'fn' { $result = "fn";
             }
 | 'type' { $result = "type";
             }
 | 'extern' { $result = "extern";
-            }
-| 'variant' { $result = "variant";
             }
 ;
 field returns [Field result]
@@ -122,7 +118,7 @@ list_o_constructor_p_ returns [System.Collections.Generic.List<Ctor> result]
             }
 ;
 def_t_sort returns [Def result]
-: def_t_sort_0__1='variant' def_t_sort_0__2=IDENTIFIER '=' def_t_sort_0__4=list_o_constructor_p_ { $result = (Def) DefSort((Pos) (Pos) getPos((IToken) _localctx.def_t_sort_0__1), (Sort) (Sort) Sort((string) (string) lexeme((IToken) _localctx.def_t_sort_0__2), (System.Collections.Generic.List<Ctor>) _localctx.def_t_sort_0__4.result));
+: def_t_sort_0__1='type' def_t_sort_0__2=IDENTIFIER '=' def_t_sort_0__4=list_o_constructor_p_ { $result = (Def) DefSort((Pos) (Pos) getPos((IToken) _localctx.def_t_sort_0__1), (Sort) (Sort) Sort((string) (string) lexeme((IToken) _localctx.def_t_sort_0__2), (System.Collections.Generic.List<Ctor>) _localctx.def_t_sort_0__4.result));
             }
 ;
 seplist_o__i__s__i__s_def_t_typ_p_ returns [System.Collections.Generic.List<Ty> result]

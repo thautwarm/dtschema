@@ -1,14 +1,18 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices.Marshalling;
 
 namespace DTSchema.Compiler.Backends;
 
-// dart is a host backend, which
-// means it supports deserialization
-// but not serialization
+/**
+    <summary>
+    The dart backend is a host backend,
+    which means that it does not support
+    serialize functions (sending signals).
+    Instead, it supports deserialize functions
+    from a remote "signal slot".
+    </summary>
+*/
 public sealed class DartHost : Backend
 {
     Printer P = new();
