@@ -1,0 +1,7 @@
+__pycache__/
+.pmake_caches/
+build/
+obj/
+bin/
+.vscode/
+tmp/

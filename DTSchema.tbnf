@@ -1,0 +1,86 @@
+extern type Pos
+extern var lexeme : (value: token) -> str
+extern var appendList : <a> (list<a>, a) -> list<a>
+extern var notSingular : <a> (list<a>) -> bool
+extern var select : <a> (bool, a, a) -> a
+extern var firstElt : <a> (list<a>) -> a
+extern var getPos: token -> Pos
+
+type Def
+type Ty
+type Ret
+
+type Field(name: str, typ: Ty, nullable: bool)
+type Ctor(name: str, fields: list<Field>)
+type Sort(name: str, variants: list<Ctor>)
+
+case DefSort : (pos: Pos, sort: Sort) -> Def
+case DefRecord : (pos: Pos, ctor: Ctor) -> Def
+case DefExtern : (pos: Pos, name: str) -> Def
+
+case HasRet: (ret: Ty, nullable: bool) -> Ret
+case NoRet: () -> Ret
+
+case TyNamed : (name: str) -> Ty
+case TyTuple: (elts: list<Ty>) -> Ty
+case TyMap: (key: Ty, value: Ty) -> Ty
+case TyList: (elt: Ty) -> Ty
+case TyFn: (args: list<Field>, ret: Ret) -> Ty
+
+seplist(sep, elt) : seplist(sep, elt) sep elt { appendList($1, $3) }
+                  | elt { [$1] }
+
+list(elt) : list(elt) elt { appendList($1, $2) }
+          | elt { [$1] }
+
+start : list(definition) { $1 }
+
+definition : def-record   { $1 }
+           | def-sort     { $1 }
+           | def-extern   { $1 }
+
+def-extern : 'extern' 'type' <IDENTIFIER> { DefExtern(getPos($1), lexeme($3)) }
+
+def-record : 'data' ctor { DefRecord(getPos($1), $2) }
+
+optional-annotation : '?' ':' { true } | ':' { false }
+
+fieldname : <IDENTIFIER> { lexeme($1) }
+          | 'data'       { "data" }
+          | 'fn'         { "fn" }
+          | 'type'       { "type" }
+          | 'extern'     { "extern" }
+          | 'variant'    { "variant" }
+
+field : fieldname optional-annotation def-typ { Field($1, $3, $2) }
+
+ctor : <IDENTIFIER> '(' seplist(',', field)  ')' { Ctor(lexeme($1), $3) }
+     | <IDENTIFIER> { Ctor(lexeme($1), []) }
+
+constructor: '|' ctor { $2 }
+
+def-sort : 'variant' <IDENTIFIER> '=' list(constructor) { DefSort(getPos($1), Sort(lexeme($2), $4)) }
+
+def-typ : '[' seplist(',', def-typ) ']'                       { select(notSingular($2), TyTuple($2), TyList(firstElt($2))) }
+        | '{' def-typ ':' def-typ '}'                         { TyMap($2, $4) }
+        | '{' seplist(',', def-typ) '}'                       { TyTuple($2) }
+        | <IDENTIFIER>                                        { TyNamed(lexeme($1)) }
+        | 'fn' '[' seplist(',', field)  ']' '=>' nullable-ret { TyFn($3, $6) }
+        | 'fn' '[' seplist(',', field)  ']'                   { TyFn($3, NoRet()) }
+
+nullable-ret : def-typ '?' { HasRet($1, true) }
+             | def-typ     { HasRet($1, false) }
+
+UNICODE = [\u00ff-\ud7ff] | [\udfff-\uffff];
+LETTER = [a-z] | [A-Z];
+DIGIT = [0-9];
+INT = DIGIT+;
+
+IDENTIFIER_HEAD = LETTER | UNICODE | '_';
+IDENTIFIER_FOLLOW = IDENTIFIER_HEAD | DIGIT;
+IDENTIFIER = IDENTIFIER_HEAD IDENTIFIER_FOLLOW* '!'?;
+
+
+ignore SPACE, LINE_COMMENT
+LINE_COMMENT = "-" "-" (!"\n")* "\n";
+SPACE = " " | "\t" | "\r" | "\n";
