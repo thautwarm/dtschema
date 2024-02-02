@@ -99,7 +99,14 @@ namespace DTSchema.Compiler.Backends
                     P++;
                     foreach (var each in @struct.Fields)
                     {
-                        _ = P << $"{each.name}: {ShowType(each.typ)};";
+                        if (each.nullable)
+                        {
+                            _ = P << $"{each.name}?: {ShowType(each.typ, fnToSignal: true)};";
+                        }
+                        else
+                        {
+                            _ = P << $"{each.name}: {ShowType(each.typ, fnToSignal: true)};";
+                        }
                     }
                     P--;
                 }
@@ -116,9 +123,9 @@ namespace DTSchema.Compiler.Backends
                 {
                     if (x.nullable)
                     {
-                        return x.name + "?: " + ShowType(x.typ);
+                        return x.name + "?: " + ShowType(x.typ, fnToSignal: false);
                     }
-                    return x.name + ": " + ShowType(x.typ);
+                    return x.name + ": " + ShowType(x.typ, fnToSignal: false);
                 })
             );
             _ = P << "export function " + @struct.Name + "(opts: {" + argSig + "})" + "{";
@@ -231,7 +238,7 @@ namespace DTSchema.Compiler.Backends
             }
         }
 
-        string ShowType(Ty t)
+        string ShowType(Ty t, bool fnToSignal)
         {
             switch (t)
             {
@@ -240,24 +247,24 @@ namespace DTSchema.Compiler.Backends
                 case TyEnum @enum:
                     return @enum.name;
                 case TyList list:
-                    return "Array<" + ShowType(list.elt) + ">";
+                    return "Array<" + ShowType(list.elt, fnToSignal) + ">";
                 case TyMap map:
-                    return "Record<" + ShowType(map.key) + "," + ShowType(map.value) + ">";
+                    return "Record<" + ShowType(map.key, fnToSignal) + "," + ShowType(map.value, fnToSignal) + ">";
                 case TyNamed named:
                     return TypeMap(named.name);
                 case TyTuple tuple:
-                    return "[" + string.Join(",", tuple.elts.Select(ShowType)) + "]";
+                    return "[" + string.Join(",", tuple.elts.Select((x) => ShowType(x, fnToSignal))) + "]";
                 case TyFn fn:
                     string funcRet;
                     if (fn.ret is HasRet hasRet)
                     {
                         if (hasRet.nullable)
                         {
-                            funcRet = "Promise<" + ShowType(hasRet.ret) + " | null | undefined" + ">";
+                            funcRet = "Promise<" + ShowType(hasRet.ret, fnToSignal) + " | null | undefined" + ">";
                         }
                         else
                         {
-                            funcRet = "Promise<" + ShowType(hasRet.ret) + ">";
+                            funcRet = "Promise<" + ShowType(hasRet.ret, fnToSignal) + ">";
                         }
                     }
                     else
@@ -270,11 +277,15 @@ namespace DTSchema.Compiler.Backends
                         {
                             if (x.nullable)
                             {
-                                return x.name + "?:" + ShowType(x.typ);
+                                return x.name + "?:" + ShowType(x.typ, fnToSignal);
                             }
-                            return x.name + ":" + ShowType(x.typ);
+                            return x.name + ":" + ShowType(x.typ, fnToSignal);
                         })
                     );
+                    if (fnToSignal)
+                    {
+                        return $"{Required}.Signal" + "<" + "(" + argTypes + ")" + "=>" + funcRet + ">";
+                    }
                     return "(" + "(" + argTypes + ")" + "=>" + funcRet + ")";
                 default:
                     throw new UnreachableException();
