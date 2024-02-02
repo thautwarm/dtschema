@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 
 namespace DTSchema.Compiler.Backends;
 
@@ -13,53 +14,32 @@ namespace DTSchema.Compiler.Backends;
     from a remote "signal slot".
     </summary>
 */
-public sealed class DartHost : Backend
+public sealed class Dart : Backend
 {
     Printer P = new();
     int unionTagIndex = 0;
     string unionSortName = "";
 
-    readonly HashSet<string> AllGeneratedTypes = [];
-
-    readonly string OutputModule;
+    readonly string Required;
 
 #pragma warning disable
-    public DartHost(TypeStore store, string outputModule) : base(store)
+    public Dart(TypeStore store, string required) : base(store)
     {
-        OutputModule = outputModule;
+        Required = required;
+
         foreach (var (k, v) in store.DeclaredTypes)
         {
             AllGeneratedTypes.Add(k);
             if (v is TypeDefVariant variant)
             {
-                foreach (var tag in variant.Cases)
+                foreach (var (Tag, _) in variant.Cases)
                 {
-                    AllGeneratedTypes.Add(tag.Tag);
+                    AllGeneratedTypes.Add(Tag);
                 }
             }
         }
     }
 #pragma warning restore
-
-    public Defer SetTag(int tagIndex)
-    {
-        var old = unionTagIndex;
-        unionTagIndex = tagIndex;
-        return new Defer(() =>
-        {
-            unionTagIndex = old;
-        });
-    }
-
-    public Defer SetSort(string sortName)
-    {
-        var old = unionSortName;
-        unionSortName = sortName;
-        return new Defer(() =>
-        {
-            unionSortName = old;
-        });
-    }
 
     public override string CodeGen(TypeStore store)
     {
@@ -74,7 +54,8 @@ public sealed class DartHost : Backend
 
     void Predef()
     {
-        _ = P << $"part of '{OutputModule}.dart';";
+        _ = P << $"import '{Required}.dart';";
+        _ = P << $"export '{Required}.dart';";
         _ = P << "";
     }
 
@@ -88,6 +69,19 @@ public sealed class DartHost : Backend
         {
             PrintStuct(@struct, false);
         }
+        else if (each is TypeDefEnum @enum)
+        {
+            _ = P << "enum " + @enum.Name + " {";
+            {
+                ++P;
+                foreach (var eachCase in @enum.Cases)
+                {
+                    _ = P << eachCase + ",";
+                }
+                --P;
+            }
+            _ = P << "}";
+        }
         else
         {
             return;
@@ -98,32 +92,11 @@ public sealed class DartHost : Backend
     {
         _ = P << "abstract class " + variant.Name + " {";
         ++P;
-        _ = P << "int get __Tag;";
+        _ = P << "int get __tag;";
 
         // print the serialization impl
         {
-            _ = P << $"static dynamic toJson(SerdeCtx ctx, {variant.Name} self) {{";
-            {
-                ++P;
-                int tag = 0;
-                _ = P << "switch (self.__Tag) {";
-                {
-                    ++P;
-                    foreach (var (Tag, fields) in variant.Cases)
-                    {
-                        _ = P << "case " + tag + ":";
-                        ++P;
-                        _ = P << "return " + "Serde.tagged(" + tag + ", " +  ShowSerde(new TyNamed(Tag), "self as " + Tag, false) + ")" + ";";
-                        --P;
-                        tag++;
-                    }
-                    _ = P << "default: throw Exception(\"" + variant.Name + ":unknown tag\");";
-                    --P;
-                }
-                _ = P << "}";
-                --P;
-            }
-            _ = P << "}";
+            _ = P << $"dynamic toJson(SerdeCtx ctx);";
         }
 
         // print the deserialization impl
@@ -134,7 +107,7 @@ public sealed class DartHost : Backend
             _ = P << "if (json is! Map<String, dynamic>) throw Exception(\""
                      + variant.Name + ":" + "expected a Map<String, dynamic> but got ${json.runtimeType}\");";
 
-            _ = P << "var tag = json[\"__Tag\"];";
+            _ = P << "var tag = json[\"__tag\"];";
             _ = P << "if (tag is! num) throw Exception(\""
                      + variant.Name + ":" + "expected a int but got ${tag.runtimeType}\");";
 
@@ -189,19 +162,27 @@ public sealed class DartHost : Backend
             if (hasSort)
             {
                 // print the tag getter
-                _ = P << "int get __Tag => " + unionTagIndex + ";";
+                _ = P << "@override";
+                _ = P << "int get __tag => " + unionTagIndex + ";";
             }
 
-            foreach (var field in @struct.fields)
+            foreach (var field in @struct.Fields)
             {
-                _ = P << ShowType(field.typ) + " " + field.name + ";";
+                if (field.nullable)
+                {
+                    _ = P << ShowType(field.typ) + "? " + field.name + ";";
+                }
+                else
+                {
+                    _ = P << ShowType(field.typ) + " " + field.name + ";";
+                }
             }
 
             // print the dart constructor
             _ = P << @struct.Name + "(";
             {
                 ++P;
-                foreach (var field in @struct.fields)
+                foreach (var field in @struct.Fields)
                 {
                     _ = P << "this." + field.name + ",";
                 }
@@ -211,15 +192,24 @@ public sealed class DartHost : Backend
 
 
             // print the serialization impl
-            _ = P << $"static dynamic toJson(SerdeCtx ctx, {@struct.Name} self) {{";
+            if (hasSort)
+            {
+                _ = P << "@override";
+            }
+
+            _ = P << $"dynamic toJson(SerdeCtx ctx) {{";
             {
                 ++P;
                 _ = P << "return <String, dynamic>{";
                 {
                     ++P;
-                    foreach (var field in @struct.fields)
+                    if (hasSort)
                     {
-                        _ = P << "\"" + field.name + "\": " + ShowSerde(field.typ, "self." + field.name, field.nullable) + ",";
+                        _ = P << "\"__tag\": __tag,";
+                    }
+                    foreach (var field in @struct.Fields)
+                    {
+                        _ = P << "\"" + field.name + "\": " + ShowSerde(field.typ, field.name, field.nullable) + ",";
                     }
                     --P;
                 }
@@ -241,7 +231,7 @@ public sealed class DartHost : Backend
                 _ = P << "return " + @struct.Name + "(";
                 {
                     ++P;
-                    foreach (var field in @struct.fields)
+                    foreach (var field in @struct.Fields)
                     {
                         _ = P << ShowDeserde(field.typ, "json[\"" + field.name + "\"]", field.nullable) + ",";
                     }
@@ -260,6 +250,10 @@ public sealed class DartHost : Backend
     {
         switch (t)
         {
+            case TyJSON _:
+                return "Object?";
+            case TyEnum @enum:
+                return @enum.name;
             case TyList list:
                 return "List<" + ShowType(list.elt) + ">";
             case TyMap map:
@@ -285,7 +279,17 @@ public sealed class DartHost : Backend
                 {
                     asyncRet = "Future<void>";
                 }
-                var asyncArgs = string.Join(",", fn.args.Select(x => ShowType(x.typ)));
+                var asyncArgs = string.Join(
+                    ",",
+                    fn.args.Select(x =>
+                    {
+                        if (x.nullable)
+                        {
+                            return ShowType(x.typ) + "? " + x.name;
+                        }
+                        return ShowType(x.typ) + " " + x.name;
+                    })
+                );
                 return asyncRet + " Function(" + asyncArgs + ")";
             default:
                 throw new UnreachableException();
@@ -306,6 +310,10 @@ public sealed class DartHost : Backend
     {
         switch (t)
         {
+            case TyJSON _:
+                return expr;
+            case TyEnum @enum:
+                return string.Format("{0}.index", expr);
             case TyList list:
                 return string.Format("Serde.list({0}, {1})", expr, "(_x) => " + ShowSerdeNotNull(list.elt, "_x"));
             case TyTuple tuple:
@@ -320,7 +328,7 @@ public sealed class DartHost : Backend
                 );
             case TyNamed named:
                 if (AllGeneratedTypes.Contains(named.name))
-                    return string.Format("{0}.toJson(ctx, {1})", ShowType(named), expr);
+                    return string.Format("{0}.toJson(ctx)", expr);
                 return string.Format("Serde.{0}(ctx, {1})", named.name, expr);
             case TyFn fn:
                 var tStr = ShowType(fn);
@@ -350,6 +358,10 @@ public sealed class DartHost : Backend
     {
         switch (t)
         {
+            case TyJSON _:
+                return expr;
+            case TyEnum @enum:
+                return string.Format("{1}.values[({0} as num).toInt()]", expr, @enum.name);
             case TyList list:
                 return string.Format(
                     "Deserde.list<{0}>({1}, {2})",
@@ -358,7 +370,7 @@ public sealed class DartHost : Backend
                     "(_x) => " + ShowDeserdeNotNull(list.elt, "_x")
                 );
             case TyTuple tuple:
-                var r = string.Join(",", tuple.elts.Select((t, i) => ShowDeserdeNotNull(t, expr + ".$" + (i + 1))));
+                var r = string.Join(",", tuple.elts.Select((t, i) => ShowDeserdeNotNull(t, expr + $"[{i}]")));
                 return "(" + r + ")";
             case TyMap map:
                 return string.Format(
@@ -375,7 +387,7 @@ public sealed class DartHost : Backend
                 return string.Format("Deserde.{0}(ctx, {1})", named.name, expr);
             case TyFn fn:
 
-                var argSig = string.Join(",", fn.args.Select(x => ShowType(x.typ) + " " + x.name));
+                var argSig = string.Join(",", fn.args.Select(x => ShowType(x.typ) + (x.nullable ? "?" : "") + " " + x.name));
                 string fnBody;
                 var serializedData = "[" + string.Join(",", fn.args.Select(x => ShowSerde(x.typ, x.name, x.nullable))) + "]";
                 if (fn.ret is HasRet hasRet)
@@ -407,7 +419,6 @@ public sealed class DartHost : Backend
             "int" => "int",
             "float" => "double",
             "str" => "String",
-            "bytes" => "Uint8List",
             _ => typeName,
         };
     }

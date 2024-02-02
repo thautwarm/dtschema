@@ -85,6 +85,42 @@ public partial class DTSchemaBaseListener : IDTSchemaListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitDefinition([NotNull] DTSchemaParser.DefinitionContext context) { }
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="DTSchemaParser.enum_t_case"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterEnum_t_case([NotNull] DTSchemaParser.Enum_t_caseContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="DTSchemaParser.enum_t_case"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitEnum_t_case([NotNull] DTSchemaParser.Enum_t_caseContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="DTSchemaParser.list_o_enum_t_case_p_"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterList_o_enum_t_case_p_([NotNull] DTSchemaParser.List_o_enum_t_case_p_Context context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="DTSchemaParser.list_o_enum_t_case_p_"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitList_o_enum_t_case_p_([NotNull] DTSchemaParser.List_o_enum_t_case_p_Context context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="DTSchemaParser.def_t_enum"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterDef_t_enum([NotNull] DTSchemaParser.Def_t_enumContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="DTSchemaParser.def_t_enum"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitDef_t_enum([NotNull] DTSchemaParser.Def_t_enumContext context) { }
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="DTSchemaParser.def_t_extern"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
@@ -216,6 +252,18 @@ public partial class DTSchemaBaseListener : IDTSchemaListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitSeplist_o__i__s__i__s_field_p_([NotNull] DTSchemaParser.Seplist_o__i__s__i__s_field_p_Context context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="DTSchemaParser.emptyseplist_o__i__s__i__s_field_p_"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterEmptyseplist_o__i__s__i__s_field_p_([NotNull] DTSchemaParser.Emptyseplist_o__i__s__i__s_field_p_Context context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="DTSchemaParser.emptyseplist_o__i__s__i__s_field_p_"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitEmptyseplist_o__i__s__i__s_field_p_([NotNull] DTSchemaParser.Emptyseplist_o__i__s__i__s_field_p_Context context) { }
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="DTSchemaParser.def_t_typ"/>.
 	/// <para>The default implementation does nothing.</para>

@@ -38,28 +38,32 @@ public partial class DTSchemaParser : Parser {
 	protected static PredictionContextCache sharedContextCache = new PredictionContextCache();
 	public const int
 		T__0=1, T__1=2, T__2=3, T__3=4, T__4=5, T__5=6, T__6=7, T__7=8, T__8=9, 
-		T__9=10, T__10=11, T__11=12, T__12=13, T__13=14, T__14=15, IDENTIFIER=16, 
-		LINE_COMMENT=17, SPACE=18;
+		T__9=10, T__10=11, T__11=12, T__12=13, T__13=14, T__14=15, T__15=16, T__16=17, 
+		IDENTIFIER=18, LINE_COMMENT=19, SPACE=20;
 	public const int
 		RULE_start = 0, RULE_list_o_definition_p_ = 1, RULE_start__y_ = 2, RULE_definition = 3, 
-		RULE_def_t_extern = 4, RULE_def_t_record = 5, RULE_optional_t_annotation = 6, 
-		RULE_fieldname = 7, RULE_field = 8, RULE_ctor = 9, RULE_constructor = 10, 
-		RULE_list_o_constructor_p_ = 11, RULE_def_t_sort = 12, RULE_seplist_o__i__s__i__s_def_t_typ_p_ = 13, 
-		RULE_seplist_o__i__s__i__s_field_p_ = 14, RULE_def_t_typ = 15, RULE_nullable_t_ret = 16;
+		RULE_enum_t_case = 4, RULE_list_o_enum_t_case_p_ = 5, RULE_def_t_enum = 6, 
+		RULE_def_t_extern = 7, RULE_def_t_record = 8, RULE_optional_t_annotation = 9, 
+		RULE_fieldname = 10, RULE_field = 11, RULE_ctor = 12, RULE_constructor = 13, 
+		RULE_list_o_constructor_p_ = 14, RULE_def_t_sort = 15, RULE_seplist_o__i__s__i__s_def_t_typ_p_ = 16, 
+		RULE_seplist_o__i__s__i__s_field_p_ = 17, RULE_emptyseplist_o__i__s__i__s_field_p_ = 18, 
+		RULE_def_t_typ = 19, RULE_nullable_t_ret = 20;
 	public static readonly string[] ruleNames = {
-		"start", "list_o_definition_p_", "start__y_", "definition", "def_t_extern", 
-		"def_t_record", "optional_t_annotation", "fieldname", "field", "ctor", 
-		"constructor", "list_o_constructor_p_", "def_t_sort", "seplist_o__i__s__i__s_def_t_typ_p_", 
-		"seplist_o__i__s__i__s_field_p_", "def_t_typ", "nullable_t_ret"
+		"start", "list_o_definition_p_", "start__y_", "definition", "enum_t_case", 
+		"list_o_enum_t_case_p_", "def_t_enum", "def_t_extern", "def_t_record", 
+		"optional_t_annotation", "fieldname", "field", "ctor", "constructor", 
+		"list_o_constructor_p_", "def_t_sort", "seplist_o__i__s__i__s_def_t_typ_p_", 
+		"seplist_o__i__s__i__s_field_p_", "emptyseplist_o__i__s__i__s_field_p_", 
+		"def_t_typ", "nullable_t_ret"
 	};
 
 	private static readonly string[] _LiteralNames = {
-		null, "'extern'", "'type'", "'?'", "':'", "'fn'", "'('", "')'", "'|'", 
-		"'='", "','", "'['", "']'", "'{'", "'}'", "'=>'"
+		null, "'|'", "'enum'", "'='", "'extern'", "'type'", "'?'", "':'", "'fn'", 
+		"'json'", "'('", "')'", "','", "'['", "']'", "'{'", "'}'", "'=>'"
 	};
 	private static readonly string[] _SymbolicNames = {
 		null, null, null, null, null, null, null, null, null, null, null, null, 
-		null, null, null, null, "IDENTIFIER", "LINE_COMMENT", "SPACE"
+		null, null, null, null, null, null, "IDENTIFIER", "LINE_COMMENT", "SPACE"
 	};
 	public static readonly IVocabulary DefaultVocabulary = new Vocabulary(_LiteralNames, _SymbolicNames);
 
@@ -114,9 +118,17 @@ public partial class DTSchemaParser : Parser {
 	{
 	    return (Ty) new TyList(elt);
 	}
+	public static Ty TyJSON ()
+	{
+	    return (Ty) new TyJSON();
+	}
 	public static Ty TyFn (System.Collections.Generic.List<Field> args,Ret ret)
 	{
 	    return (Ty) new TyFn(args,ret);
+	}
+	public static Ty TyEnum (string name)
+	{
+	    return (Ty) new TyEnum(name);
 	}
 	public static Ret NoRet ()
 	{
@@ -137,6 +149,10 @@ public partial class DTSchemaParser : Parser {
 	public static Def DefExtern (Pos pos,string name)
 	{
 	    return (Def) new DefExtern(pos,name);
+	}
+	public static Def DefEnum (Pos pos,string name,System.Collections.Generic.List<string> cases)
+	{
+	    return (Def) new DefEnum(pos,name,cases);
 	}
 
 		public DTSchemaParser(ITokenStream input) : this(input, Console.Out, Console.Error) { }
@@ -178,9 +194,9 @@ public partial class DTSchemaParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 34;
+			State = 42;
 			_localctx.v = start__y_();
-			State = 35;
+			State = 43;
 			Match(Eof);
 			 _localctx.result =  _localctx.v.result; 
 			}
@@ -241,13 +257,13 @@ public partial class DTSchemaParser : Parser {
 			EnterOuterAlt(_localctx, 1);
 			{
 			{
-			State = 39;
+			State = 47;
 			_localctx.list_o_definition_p__1__1 = definition();
 			 _localctx.result =  new System.Collections.Generic.List<Def> { _localctx.list_o_definition_p__1__1.result };
 			            
 			}
 			Context.Stop = TokenStream.LT(-1);
-			State = 48;
+			State = 56;
 			ErrorHandler.Sync(this);
 			_alt = Interpreter.AdaptivePredict(TokenStream,0,Context);
 			while ( _alt!=2 && _alt!=global::Antlr4.Runtime.Atn.ATN.INVALID_ALT_NUMBER ) {
@@ -260,16 +276,16 @@ public partial class DTSchemaParser : Parser {
 					_localctx = new List_o_definition_p_Context(_parentctx, _parentState);
 					_localctx.list_o_definition_p__0__1 = _prevctx;
 					PushNewRecursionContext(_localctx, _startState, RULE_list_o_definition_p_);
-					State = 42;
+					State = 50;
 					if (!(Precpred(Context, 2))) throw new FailedPredicateException(this, "Precpred(Context, 2)");
-					State = 43;
+					State = 51;
 					_localctx.list_o_definition_p__0__2 = definition();
 					 _localctx.result =  (System.Collections.Generic.List<Def>) appendList<Def>((System.Collections.Generic.List<Def>) _localctx.list_o_definition_p__0__1.result, (Def) _localctx.list_o_definition_p__0__2.result);
 					                      
 					}
 					} 
 				}
-				State = 50;
+				State = 58;
 				ErrorHandler.Sync(this);
 				_alt = Interpreter.AdaptivePredict(TokenStream,0,Context);
 			}
@@ -316,7 +332,7 @@ public partial class DTSchemaParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 51;
+			State = 59;
 			_localctx.start__y__0__1 = list_o_definition_p_(0);
 			 _localctx.result =  _localctx.start__y__0__1.result;
 			            
@@ -338,6 +354,7 @@ public partial class DTSchemaParser : Parser {
 		public Def_t_recordContext definition_0__1;
 		public Def_t_sortContext definition_1__1;
 		public Def_t_externContext definition_2__1;
+		public Def_t_enumContext definition_3__1;
 		[System.Diagnostics.DebuggerNonUserCode] public Def_t_recordContext def_t_record() {
 			return GetRuleContext<Def_t_recordContext>(0);
 		}
@@ -346,6 +363,9 @@ public partial class DTSchemaParser : Parser {
 		}
 		[System.Diagnostics.DebuggerNonUserCode] public Def_t_externContext def_t_extern() {
 			return GetRuleContext<Def_t_externContext>(0);
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public Def_t_enumContext def_t_enum() {
+			return GetRuleContext<Def_t_enumContext>(0);
 		}
 		public DefinitionContext(ParserRuleContext parent, int invokingState)
 			: base(parent, invokingState)
@@ -369,13 +389,13 @@ public partial class DTSchemaParser : Parser {
 		DefinitionContext _localctx = new DefinitionContext(Context, State);
 		EnterRule(_localctx, 6, RULE_definition);
 		try {
-			State = 63;
+			State = 74;
 			ErrorHandler.Sync(this);
 			switch ( Interpreter.AdaptivePredict(TokenStream,1,Context) ) {
 			case 1:
 				EnterOuterAlt(_localctx, 1);
 				{
-				State = 54;
+				State = 62;
 				_localctx.definition_0__1 = def_t_record();
 				 _localctx.result =  _localctx.definition_0__1.result;
 				            
@@ -384,7 +404,7 @@ public partial class DTSchemaParser : Parser {
 			case 2:
 				EnterOuterAlt(_localctx, 2);
 				{
-				State = 57;
+				State = 65;
 				_localctx.definition_1__1 = def_t_sort();
 				 _localctx.result =  _localctx.definition_1__1.result;
 				            
@@ -393,12 +413,214 @@ public partial class DTSchemaParser : Parser {
 			case 3:
 				EnterOuterAlt(_localctx, 3);
 				{
-				State = 60;
+				State = 68;
 				_localctx.definition_2__1 = def_t_extern();
 				 _localctx.result =  _localctx.definition_2__1.result;
 				            
 				}
 				break;
+			case 4:
+				EnterOuterAlt(_localctx, 4);
+				{
+				State = 71;
+				_localctx.definition_3__1 = def_t_enum();
+				 _localctx.result =  _localctx.definition_3__1.result;
+				            
+				}
+				break;
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			ErrorHandler.ReportError(this, re);
+			ErrorHandler.Recover(this, re);
+		}
+		finally {
+			ExitRule();
+		}
+		return _localctx;
+	}
+
+	public partial class Enum_t_caseContext : ParserRuleContext {
+		public string result;
+		public IToken enum_t_case_0__2;
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode IDENTIFIER() { return GetToken(DTSchemaParser.IDENTIFIER, 0); }
+		public Enum_t_caseContext(ParserRuleContext parent, int invokingState)
+			: base(parent, invokingState)
+		{
+		}
+		public override int RuleIndex { get { return RULE_enum_t_case; } }
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void EnterRule(IParseTreeListener listener) {
+			IDTSchemaListener typedListener = listener as IDTSchemaListener;
+			if (typedListener != null) typedListener.EnterEnum_t_case(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void ExitRule(IParseTreeListener listener) {
+			IDTSchemaListener typedListener = listener as IDTSchemaListener;
+			if (typedListener != null) typedListener.ExitEnum_t_case(this);
+		}
+	}
+
+	[RuleVersion(0)]
+	public Enum_t_caseContext enum_t_case() {
+		Enum_t_caseContext _localctx = new Enum_t_caseContext(Context, State);
+		EnterRule(_localctx, 8, RULE_enum_t_case);
+		try {
+			EnterOuterAlt(_localctx, 1);
+			{
+			State = 76;
+			Match(T__0);
+			State = 77;
+			_localctx.enum_t_case_0__2 = Match(IDENTIFIER);
+			 _localctx.result =  (string) lexeme((IToken) _localctx.enum_t_case_0__2);
+			            
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			ErrorHandler.ReportError(this, re);
+			ErrorHandler.Recover(this, re);
+		}
+		finally {
+			ExitRule();
+		}
+		return _localctx;
+	}
+
+	public partial class List_o_enum_t_case_p_Context : ParserRuleContext {
+		public System.Collections.Generic.List<string> result;
+		public List_o_enum_t_case_p_Context list_o_enum_t_case_p__0__1;
+		public Enum_t_caseContext list_o_enum_t_case_p__1__1;
+		public Enum_t_caseContext list_o_enum_t_case_p__0__2;
+		[System.Diagnostics.DebuggerNonUserCode] public Enum_t_caseContext enum_t_case() {
+			return GetRuleContext<Enum_t_caseContext>(0);
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public List_o_enum_t_case_p_Context list_o_enum_t_case_p_() {
+			return GetRuleContext<List_o_enum_t_case_p_Context>(0);
+		}
+		public List_o_enum_t_case_p_Context(ParserRuleContext parent, int invokingState)
+			: base(parent, invokingState)
+		{
+		}
+		public override int RuleIndex { get { return RULE_list_o_enum_t_case_p_; } }
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void EnterRule(IParseTreeListener listener) {
+			IDTSchemaListener typedListener = listener as IDTSchemaListener;
+			if (typedListener != null) typedListener.EnterList_o_enum_t_case_p_(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void ExitRule(IParseTreeListener listener) {
+			IDTSchemaListener typedListener = listener as IDTSchemaListener;
+			if (typedListener != null) typedListener.ExitList_o_enum_t_case_p_(this);
+		}
+	}
+
+	[RuleVersion(0)]
+	public List_o_enum_t_case_p_Context list_o_enum_t_case_p_() {
+		return list_o_enum_t_case_p_(0);
+	}
+
+	private List_o_enum_t_case_p_Context list_o_enum_t_case_p_(int _p) {
+		ParserRuleContext _parentctx = Context;
+		int _parentState = State;
+		List_o_enum_t_case_p_Context _localctx = new List_o_enum_t_case_p_Context(Context, _parentState);
+		List_o_enum_t_case_p_Context _prevctx = _localctx;
+		int _startState = 10;
+		EnterRecursionRule(_localctx, 10, RULE_list_o_enum_t_case_p_, _p);
+		try {
+			int _alt;
+			EnterOuterAlt(_localctx, 1);
+			{
+			{
+			State = 81;
+			_localctx.list_o_enum_t_case_p__1__1 = enum_t_case();
+			 _localctx.result =  new System.Collections.Generic.List<string> { _localctx.list_o_enum_t_case_p__1__1.result };
+			            
+			}
+			Context.Stop = TokenStream.LT(-1);
+			State = 90;
+			ErrorHandler.Sync(this);
+			_alt = Interpreter.AdaptivePredict(TokenStream,2,Context);
+			while ( _alt!=2 && _alt!=global::Antlr4.Runtime.Atn.ATN.INVALID_ALT_NUMBER ) {
+				if ( _alt==1 ) {
+					if ( ParseListeners!=null )
+						TriggerExitRuleEvent();
+					_prevctx = _localctx;
+					{
+					{
+					_localctx = new List_o_enum_t_case_p_Context(_parentctx, _parentState);
+					_localctx.list_o_enum_t_case_p__0__1 = _prevctx;
+					PushNewRecursionContext(_localctx, _startState, RULE_list_o_enum_t_case_p_);
+					State = 84;
+					if (!(Precpred(Context, 2))) throw new FailedPredicateException(this, "Precpred(Context, 2)");
+					State = 85;
+					_localctx.list_o_enum_t_case_p__0__2 = enum_t_case();
+					 _localctx.result =  (System.Collections.Generic.List<string>) appendList<string>((System.Collections.Generic.List<string>) _localctx.list_o_enum_t_case_p__0__1.result, (string) _localctx.list_o_enum_t_case_p__0__2.result);
+					                      
+					}
+					} 
+				}
+				State = 92;
+				ErrorHandler.Sync(this);
+				_alt = Interpreter.AdaptivePredict(TokenStream,2,Context);
+			}
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			ErrorHandler.ReportError(this, re);
+			ErrorHandler.Recover(this, re);
+		}
+		finally {
+			UnrollRecursionContexts(_parentctx);
+		}
+		return _localctx;
+	}
+
+	public partial class Def_t_enumContext : ParserRuleContext {
+		public Def result;
+		public IToken def_t_enum_0__1;
+		public IToken def_t_enum_0__2;
+		public List_o_enum_t_case_p_Context def_t_enum_0__4;
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode IDENTIFIER() { return GetToken(DTSchemaParser.IDENTIFIER, 0); }
+		[System.Diagnostics.DebuggerNonUserCode] public List_o_enum_t_case_p_Context list_o_enum_t_case_p_() {
+			return GetRuleContext<List_o_enum_t_case_p_Context>(0);
+		}
+		public Def_t_enumContext(ParserRuleContext parent, int invokingState)
+			: base(parent, invokingState)
+		{
+		}
+		public override int RuleIndex { get { return RULE_def_t_enum; } }
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void EnterRule(IParseTreeListener listener) {
+			IDTSchemaListener typedListener = listener as IDTSchemaListener;
+			if (typedListener != null) typedListener.EnterDef_t_enum(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void ExitRule(IParseTreeListener listener) {
+			IDTSchemaListener typedListener = listener as IDTSchemaListener;
+			if (typedListener != null) typedListener.ExitDef_t_enum(this);
+		}
+	}
+
+	[RuleVersion(0)]
+	public Def_t_enumContext def_t_enum() {
+		Def_t_enumContext _localctx = new Def_t_enumContext(Context, State);
+		EnterRule(_localctx, 12, RULE_def_t_enum);
+		try {
+			EnterOuterAlt(_localctx, 1);
+			{
+			State = 93;
+			_localctx.def_t_enum_0__1 = Match(T__1);
+			State = 94;
+			_localctx.def_t_enum_0__2 = Match(IDENTIFIER);
+			State = 95;
+			Match(T__2);
+			State = 96;
+			_localctx.def_t_enum_0__4 = list_o_enum_t_case_p_(0);
+			 _localctx.result =  (Def) DefEnum((Pos) (Pos) getPos((IToken) _localctx.def_t_enum_0__1), (string) (string) lexeme((IToken) _localctx.def_t_enum_0__2), (System.Collections.Generic.List<string>) _localctx.def_t_enum_0__4.result);
+			            
 			}
 		}
 		catch (RecognitionException re) {
@@ -437,15 +659,15 @@ public partial class DTSchemaParser : Parser {
 	[RuleVersion(0)]
 	public Def_t_externContext def_t_extern() {
 		Def_t_externContext _localctx = new Def_t_externContext(Context, State);
-		EnterRule(_localctx, 8, RULE_def_t_extern);
+		EnterRule(_localctx, 14, RULE_def_t_extern);
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 65;
-			_localctx.def_t_extern_0__1 = Match(T__0);
-			State = 66;
-			Match(T__1);
-			State = 67;
+			State = 99;
+			_localctx.def_t_extern_0__1 = Match(T__3);
+			State = 100;
+			Match(T__4);
+			State = 101;
 			_localctx.def_t_extern_0__3 = Match(IDENTIFIER);
 			 _localctx.result =  (Def) DefExtern((Pos) (Pos) getPos((IToken) _localctx.def_t_extern_0__1), (string) (string) lexeme((IToken) _localctx.def_t_extern_0__3));
 			            
@@ -489,13 +711,13 @@ public partial class DTSchemaParser : Parser {
 	[RuleVersion(0)]
 	public Def_t_recordContext def_t_record() {
 		Def_t_recordContext _localctx = new Def_t_recordContext(Context, State);
-		EnterRule(_localctx, 10, RULE_def_t_record);
+		EnterRule(_localctx, 16, RULE_def_t_record);
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 70;
-			_localctx.def_t_record_0__1 = Match(T__1);
-			State = 71;
+			State = 104;
+			_localctx.def_t_record_0__1 = Match(T__4);
+			State = 105;
 			_localctx.def_t_record_0__2 = ctor();
 			 _localctx.result =  (Def) DefRecord((Pos) (Pos) getPos((IToken) _localctx.def_t_record_0__1), (Ctor) _localctx.def_t_record_0__2.result);
 			            
@@ -534,27 +756,27 @@ public partial class DTSchemaParser : Parser {
 	[RuleVersion(0)]
 	public Optional_t_annotationContext optional_t_annotation() {
 		Optional_t_annotationContext _localctx = new Optional_t_annotationContext(Context, State);
-		EnterRule(_localctx, 12, RULE_optional_t_annotation);
+		EnterRule(_localctx, 18, RULE_optional_t_annotation);
 		try {
-			State = 79;
+			State = 113;
 			ErrorHandler.Sync(this);
 			switch (TokenStream.LA(1)) {
-			case T__2:
+			case T__5:
 				EnterOuterAlt(_localctx, 1);
 				{
-				State = 74;
-				Match(T__2);
-				State = 75;
-				Match(T__3);
+				State = 108;
+				Match(T__5);
+				State = 109;
+				Match(T__6);
 				 _localctx.result =  true;
 				            
 				}
 				break;
-			case T__3:
+			case T__6:
 				EnterOuterAlt(_localctx, 2);
 				{
-				State = 77;
-				Match(T__3);
+				State = 111;
+				Match(T__6);
 				 _localctx.result =  false;
 				            
 				}
@@ -598,44 +820,62 @@ public partial class DTSchemaParser : Parser {
 	[RuleVersion(0)]
 	public FieldnameContext fieldname() {
 		FieldnameContext _localctx = new FieldnameContext(Context, State);
-		EnterRule(_localctx, 14, RULE_fieldname);
+		EnterRule(_localctx, 20, RULE_fieldname);
 		try {
-			State = 89;
+			State = 127;
 			ErrorHandler.Sync(this);
 			switch (TokenStream.LA(1)) {
 			case IDENTIFIER:
 				EnterOuterAlt(_localctx, 1);
 				{
-				State = 81;
+				State = 115;
 				_localctx.fieldname_0__1 = Match(IDENTIFIER);
 				 _localctx.result =  (string) lexeme((IToken) _localctx.fieldname_0__1);
 				            
 				}
 				break;
-			case T__4:
+			case T__7:
 				EnterOuterAlt(_localctx, 2);
 				{
-				State = 83;
-				Match(T__4);
+				State = 117;
+				Match(T__7);
 				 _localctx.result =  "fn";
 				            
 				}
 				break;
-			case T__1:
+			case T__4:
 				EnterOuterAlt(_localctx, 3);
 				{
-				State = 85;
-				Match(T__1);
+				State = 119;
+				Match(T__4);
 				 _localctx.result =  "type";
 				            
 				}
 				break;
-			case T__0:
+			case T__3:
 				EnterOuterAlt(_localctx, 4);
 				{
-				State = 87;
-				Match(T__0);
+				State = 121;
+				Match(T__3);
 				 _localctx.result =  "extern";
+				            
+				}
+				break;
+			case T__1:
+				EnterOuterAlt(_localctx, 5);
+				{
+				State = 123;
+				Match(T__1);
+				 _localctx.result =  "enum";
+				            
+				}
+				break;
+			case T__8:
+				EnterOuterAlt(_localctx, 6);
+				{
+				State = 125;
+				Match(T__8);
+				 _localctx.result =  "json";
 				            
 				}
 				break;
@@ -688,15 +928,15 @@ public partial class DTSchemaParser : Parser {
 	[RuleVersion(0)]
 	public FieldContext field() {
 		FieldContext _localctx = new FieldContext(Context, State);
-		EnterRule(_localctx, 16, RULE_field);
+		EnterRule(_localctx, 22, RULE_field);
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 91;
+			State = 129;
 			_localctx.field_0__1 = fieldname();
-			State = 92;
+			State = 130;
 			_localctx.field_0__2 = optional_t_annotation();
-			State = 93;
+			State = 131;
 			_localctx.field_0__3 = def_t_typ();
 			 _localctx.result =  (Field) Field((string) _localctx.field_0__1.result, (Ty) _localctx.field_0__3.result, (bool) _localctx.field_0__2.result);
 			            
@@ -742,22 +982,22 @@ public partial class DTSchemaParser : Parser {
 	[RuleVersion(0)]
 	public CtorContext ctor() {
 		CtorContext _localctx = new CtorContext(Context, State);
-		EnterRule(_localctx, 18, RULE_ctor);
+		EnterRule(_localctx, 24, RULE_ctor);
 		try {
-			State = 104;
+			State = 142;
 			ErrorHandler.Sync(this);
-			switch ( Interpreter.AdaptivePredict(TokenStream,4,Context) ) {
+			switch ( Interpreter.AdaptivePredict(TokenStream,5,Context) ) {
 			case 1:
 				EnterOuterAlt(_localctx, 1);
 				{
-				State = 96;
+				State = 134;
 				_localctx.ctor_0__1 = Match(IDENTIFIER);
-				State = 97;
-				Match(T__5);
-				State = 98;
+				State = 135;
+				Match(T__9);
+				State = 136;
 				_localctx.ctor_0__3 = seplist_o__i__s__i__s_field_p_(0);
-				State = 99;
-				Match(T__6);
+				State = 137;
+				Match(T__10);
 				 _localctx.result =  (Ctor) Ctor((string) (string) lexeme((IToken) _localctx.ctor_0__1), (System.Collections.Generic.List<Field>) _localctx.ctor_0__3.result);
 				            
 				}
@@ -765,7 +1005,7 @@ public partial class DTSchemaParser : Parser {
 			case 2:
 				EnterOuterAlt(_localctx, 2);
 				{
-				State = 102;
+				State = 140;
 				_localctx.ctor_1__1 = Match(IDENTIFIER);
 				 _localctx.result =  (Ctor) Ctor((string) (string) lexeme((IToken) _localctx.ctor_1__1), (System.Collections.Generic.List<Field>) new System.Collections.Generic.List<Field> {  });
 				            
@@ -810,13 +1050,13 @@ public partial class DTSchemaParser : Parser {
 	[RuleVersion(0)]
 	public ConstructorContext constructor() {
 		ConstructorContext _localctx = new ConstructorContext(Context, State);
-		EnterRule(_localctx, 20, RULE_constructor);
+		EnterRule(_localctx, 26, RULE_constructor);
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 106;
-			Match(T__7);
-			State = 107;
+			State = 144;
+			Match(T__0);
+			State = 145;
 			_localctx.constructor_0__2 = ctor();
 			 _localctx.result =  _localctx.constructor_0__2.result;
 			            
@@ -871,22 +1111,22 @@ public partial class DTSchemaParser : Parser {
 		int _parentState = State;
 		List_o_constructor_p_Context _localctx = new List_o_constructor_p_Context(Context, _parentState);
 		List_o_constructor_p_Context _prevctx = _localctx;
-		int _startState = 22;
-		EnterRecursionRule(_localctx, 22, RULE_list_o_constructor_p_, _p);
+		int _startState = 28;
+		EnterRecursionRule(_localctx, 28, RULE_list_o_constructor_p_, _p);
 		try {
 			int _alt;
 			EnterOuterAlt(_localctx, 1);
 			{
 			{
-			State = 111;
+			State = 149;
 			_localctx.list_o_constructor_p__1__1 = constructor();
 			 _localctx.result =  new System.Collections.Generic.List<Ctor> { _localctx.list_o_constructor_p__1__1.result };
 			            
 			}
 			Context.Stop = TokenStream.LT(-1);
-			State = 120;
+			State = 158;
 			ErrorHandler.Sync(this);
-			_alt = Interpreter.AdaptivePredict(TokenStream,5,Context);
+			_alt = Interpreter.AdaptivePredict(TokenStream,6,Context);
 			while ( _alt!=2 && _alt!=global::Antlr4.Runtime.Atn.ATN.INVALID_ALT_NUMBER ) {
 				if ( _alt==1 ) {
 					if ( ParseListeners!=null )
@@ -897,18 +1137,18 @@ public partial class DTSchemaParser : Parser {
 					_localctx = new List_o_constructor_p_Context(_parentctx, _parentState);
 					_localctx.list_o_constructor_p__0__1 = _prevctx;
 					PushNewRecursionContext(_localctx, _startState, RULE_list_o_constructor_p_);
-					State = 114;
+					State = 152;
 					if (!(Precpred(Context, 2))) throw new FailedPredicateException(this, "Precpred(Context, 2)");
-					State = 115;
+					State = 153;
 					_localctx.list_o_constructor_p__0__2 = constructor();
 					 _localctx.result =  (System.Collections.Generic.List<Ctor>) appendList<Ctor>((System.Collections.Generic.List<Ctor>) _localctx.list_o_constructor_p__0__1.result, (Ctor) _localctx.list_o_constructor_p__0__2.result);
 					                      
 					}
 					} 
 				}
-				State = 122;
+				State = 160;
 				ErrorHandler.Sync(this);
-				_alt = Interpreter.AdaptivePredict(TokenStream,5,Context);
+				_alt = Interpreter.AdaptivePredict(TokenStream,6,Context);
 			}
 			}
 		}
@@ -952,17 +1192,17 @@ public partial class DTSchemaParser : Parser {
 	[RuleVersion(0)]
 	public Def_t_sortContext def_t_sort() {
 		Def_t_sortContext _localctx = new Def_t_sortContext(Context, State);
-		EnterRule(_localctx, 24, RULE_def_t_sort);
+		EnterRule(_localctx, 30, RULE_def_t_sort);
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 123;
-			_localctx.def_t_sort_0__1 = Match(T__1);
-			State = 124;
+			State = 161;
+			_localctx.def_t_sort_0__1 = Match(T__4);
+			State = 162;
 			_localctx.def_t_sort_0__2 = Match(IDENTIFIER);
-			State = 125;
-			Match(T__8);
-			State = 126;
+			State = 163;
+			Match(T__2);
+			State = 164;
 			_localctx.def_t_sort_0__4 = list_o_constructor_p_(0);
 			 _localctx.result =  (Def) DefSort((Pos) (Pos) getPos((IToken) _localctx.def_t_sort_0__1), (Sort) (Sort) Sort((string) (string) lexeme((IToken) _localctx.def_t_sort_0__2), (System.Collections.Generic.List<Ctor>) _localctx.def_t_sort_0__4.result));
 			            
@@ -1017,22 +1257,22 @@ public partial class DTSchemaParser : Parser {
 		int _parentState = State;
 		Seplist_o__i__s__i__s_def_t_typ_p_Context _localctx = new Seplist_o__i__s__i__s_def_t_typ_p_Context(Context, _parentState);
 		Seplist_o__i__s__i__s_def_t_typ_p_Context _prevctx = _localctx;
-		int _startState = 26;
-		EnterRecursionRule(_localctx, 26, RULE_seplist_o__i__s__i__s_def_t_typ_p_, _p);
+		int _startState = 32;
+		EnterRecursionRule(_localctx, 32, RULE_seplist_o__i__s__i__s_def_t_typ_p_, _p);
 		try {
 			int _alt;
 			EnterOuterAlt(_localctx, 1);
 			{
 			{
-			State = 130;
+			State = 168;
 			_localctx.seplist_o__i__s__i__s_def_t_typ_p__1__1 = def_t_typ();
 			 _localctx.result =  new System.Collections.Generic.List<Ty> { _localctx.seplist_o__i__s__i__s_def_t_typ_p__1__1.result };
 			            
 			}
 			Context.Stop = TokenStream.LT(-1);
-			State = 140;
+			State = 178;
 			ErrorHandler.Sync(this);
-			_alt = Interpreter.AdaptivePredict(TokenStream,6,Context);
+			_alt = Interpreter.AdaptivePredict(TokenStream,7,Context);
 			while ( _alt!=2 && _alt!=global::Antlr4.Runtime.Atn.ATN.INVALID_ALT_NUMBER ) {
 				if ( _alt==1 ) {
 					if ( ParseListeners!=null )
@@ -1043,20 +1283,20 @@ public partial class DTSchemaParser : Parser {
 					_localctx = new Seplist_o__i__s__i__s_def_t_typ_p_Context(_parentctx, _parentState);
 					_localctx.seplist_o__i__s__i__s_def_t_typ_p__0__1 = _prevctx;
 					PushNewRecursionContext(_localctx, _startState, RULE_seplist_o__i__s__i__s_def_t_typ_p_);
-					State = 133;
+					State = 171;
 					if (!(Precpred(Context, 2))) throw new FailedPredicateException(this, "Precpred(Context, 2)");
-					State = 134;
-					Match(T__9);
-					State = 135;
+					State = 172;
+					Match(T__11);
+					State = 173;
 					_localctx.seplist_o__i__s__i__s_def_t_typ_p__0__3 = def_t_typ();
 					 _localctx.result =  (System.Collections.Generic.List<Ty>) appendList<Ty>((System.Collections.Generic.List<Ty>) _localctx.seplist_o__i__s__i__s_def_t_typ_p__0__1.result, (Ty) _localctx.seplist_o__i__s__i__s_def_t_typ_p__0__3.result);
 					                      
 					}
 					} 
 				}
-				State = 142;
+				State = 180;
 				ErrorHandler.Sync(this);
-				_alt = Interpreter.AdaptivePredict(TokenStream,6,Context);
+				_alt = Interpreter.AdaptivePredict(TokenStream,7,Context);
 			}
 			}
 		}
@@ -1109,22 +1349,22 @@ public partial class DTSchemaParser : Parser {
 		int _parentState = State;
 		Seplist_o__i__s__i__s_field_p_Context _localctx = new Seplist_o__i__s__i__s_field_p_Context(Context, _parentState);
 		Seplist_o__i__s__i__s_field_p_Context _prevctx = _localctx;
-		int _startState = 28;
-		EnterRecursionRule(_localctx, 28, RULE_seplist_o__i__s__i__s_field_p_, _p);
+		int _startState = 34;
+		EnterRecursionRule(_localctx, 34, RULE_seplist_o__i__s__i__s_field_p_, _p);
 		try {
 			int _alt;
 			EnterOuterAlt(_localctx, 1);
 			{
 			{
-			State = 144;
+			State = 182;
 			_localctx.seplist_o__i__s__i__s_field_p__1__1 = field();
 			 _localctx.result =  new System.Collections.Generic.List<Field> { _localctx.seplist_o__i__s__i__s_field_p__1__1.result };
 			            
 			}
 			Context.Stop = TokenStream.LT(-1);
-			State = 154;
+			State = 192;
 			ErrorHandler.Sync(this);
-			_alt = Interpreter.AdaptivePredict(TokenStream,7,Context);
+			_alt = Interpreter.AdaptivePredict(TokenStream,8,Context);
 			while ( _alt!=2 && _alt!=global::Antlr4.Runtime.Atn.ATN.INVALID_ALT_NUMBER ) {
 				if ( _alt==1 ) {
 					if ( ParseListeners!=null )
@@ -1135,20 +1375,20 @@ public partial class DTSchemaParser : Parser {
 					_localctx = new Seplist_o__i__s__i__s_field_p_Context(_parentctx, _parentState);
 					_localctx.seplist_o__i__s__i__s_field_p__0__1 = _prevctx;
 					PushNewRecursionContext(_localctx, _startState, RULE_seplist_o__i__s__i__s_field_p_);
-					State = 147;
+					State = 185;
 					if (!(Precpred(Context, 2))) throw new FailedPredicateException(this, "Precpred(Context, 2)");
-					State = 148;
-					Match(T__9);
-					State = 149;
+					State = 186;
+					Match(T__11);
+					State = 187;
 					_localctx.seplist_o__i__s__i__s_field_p__0__3 = field();
 					 _localctx.result =  (System.Collections.Generic.List<Field>) appendList<Field>((System.Collections.Generic.List<Field>) _localctx.seplist_o__i__s__i__s_field_p__0__1.result, (Field) _localctx.seplist_o__i__s__i__s_field_p__0__3.result);
 					                      
 					}
 					} 
 				}
-				State = 156;
+				State = 194;
 				ErrorHandler.Sync(this);
-				_alt = Interpreter.AdaptivePredict(TokenStream,7,Context);
+				_alt = Interpreter.AdaptivePredict(TokenStream,8,Context);
 			}
 			}
 		}
@@ -1163,16 +1403,83 @@ public partial class DTSchemaParser : Parser {
 		return _localctx;
 	}
 
+	public partial class Emptyseplist_o__i__s__i__s_field_p_Context : ParserRuleContext {
+		public System.Collections.Generic.List<Field> result;
+		public Seplist_o__i__s__i__s_field_p_Context emptyseplist_o__i__s__i__s_field_p__0__1;
+		[System.Diagnostics.DebuggerNonUserCode] public Seplist_o__i__s__i__s_field_p_Context seplist_o__i__s__i__s_field_p_() {
+			return GetRuleContext<Seplist_o__i__s__i__s_field_p_Context>(0);
+		}
+		public Emptyseplist_o__i__s__i__s_field_p_Context(ParserRuleContext parent, int invokingState)
+			: base(parent, invokingState)
+		{
+		}
+		public override int RuleIndex { get { return RULE_emptyseplist_o__i__s__i__s_field_p_; } }
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void EnterRule(IParseTreeListener listener) {
+			IDTSchemaListener typedListener = listener as IDTSchemaListener;
+			if (typedListener != null) typedListener.EnterEmptyseplist_o__i__s__i__s_field_p_(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void ExitRule(IParseTreeListener listener) {
+			IDTSchemaListener typedListener = listener as IDTSchemaListener;
+			if (typedListener != null) typedListener.ExitEmptyseplist_o__i__s__i__s_field_p_(this);
+		}
+	}
+
+	[RuleVersion(0)]
+	public Emptyseplist_o__i__s__i__s_field_p_Context emptyseplist_o__i__s__i__s_field_p_() {
+		Emptyseplist_o__i__s__i__s_field_p_Context _localctx = new Emptyseplist_o__i__s__i__s_field_p_Context(Context, State);
+		EnterRule(_localctx, 36, RULE_emptyseplist_o__i__s__i__s_field_p_);
+		try {
+			State = 199;
+			ErrorHandler.Sync(this);
+			switch (TokenStream.LA(1)) {
+			case T__1:
+			case T__3:
+			case T__4:
+			case T__7:
+			case T__8:
+			case IDENTIFIER:
+				EnterOuterAlt(_localctx, 1);
+				{
+				State = 195;
+				_localctx.emptyseplist_o__i__s__i__s_field_p__0__1 = seplist_o__i__s__i__s_field_p_(0);
+				 _localctx.result =  _localctx.emptyseplist_o__i__s__i__s_field_p__0__1.result;
+				            
+				}
+				break;
+			case T__13:
+				EnterOuterAlt(_localctx, 2);
+				{
+				 _localctx.result =  new System.Collections.Generic.List<Field> {  };
+				            
+				}
+				break;
+			default:
+				throw new NoViableAltException(this);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			ErrorHandler.ReportError(this, re);
+			ErrorHandler.Recover(this, re);
+		}
+		finally {
+			ExitRule();
+		}
+		return _localctx;
+	}
+
 	public partial class Def_t_typContext : ParserRuleContext {
 		public Ty result;
 		public Seplist_o__i__s__i__s_def_t_typ_p_Context def_t_typ_0__2;
 		public Def_t_typContext def_t_typ_1__2;
 		public Def_t_typContext def_t_typ_1__4;
-		public Seplist_o__i__s__i__s_def_t_typ_p_Context def_t_typ_2__2;
-		public IToken def_t_typ_3__1;
-		public Seplist_o__i__s__i__s_field_p_Context def_t_typ_4__3;
-		public Nullable_t_retContext def_t_typ_4__6;
-		public Seplist_o__i__s__i__s_field_p_Context def_t_typ_5__3;
+		public IToken def_t_typ_2__1;
+		public Emptyseplist_o__i__s__i__s_field_p_Context def_t_typ_3__3;
+		public Nullable_t_retContext def_t_typ_3__6;
+		public Emptyseplist_o__i__s__i__s_field_p_Context def_t_typ_4__3;
+		public IToken def_t_typ_5__2;
 		[System.Diagnostics.DebuggerNonUserCode] public Seplist_o__i__s__i__s_def_t_typ_p_Context seplist_o__i__s__i__s_def_t_typ_p_() {
 			return GetRuleContext<Seplist_o__i__s__i__s_def_t_typ_p_Context>(0);
 		}
@@ -1183,8 +1490,8 @@ public partial class DTSchemaParser : Parser {
 			return GetRuleContext<Def_t_typContext>(i);
 		}
 		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode IDENTIFIER() { return GetToken(DTSchemaParser.IDENTIFIER, 0); }
-		[System.Diagnostics.DebuggerNonUserCode] public Seplist_o__i__s__i__s_field_p_Context seplist_o__i__s__i__s_field_p_() {
-			return GetRuleContext<Seplist_o__i__s__i__s_field_p_Context>(0);
+		[System.Diagnostics.DebuggerNonUserCode] public Emptyseplist_o__i__s__i__s_field_p_Context emptyseplist_o__i__s__i__s_field_p_() {
+			return GetRuleContext<Emptyseplist_o__i__s__i__s_field_p_Context>(0);
 		}
 		[System.Diagnostics.DebuggerNonUserCode] public Nullable_t_retContext nullable_t_ret() {
 			return GetRuleContext<Nullable_t_retContext>(0);
@@ -1209,20 +1516,20 @@ public partial class DTSchemaParser : Parser {
 	[RuleVersion(0)]
 	public Def_t_typContext def_t_typ() {
 		Def_t_typContext _localctx = new Def_t_typContext(Context, State);
-		EnterRule(_localctx, 30, RULE_def_t_typ);
+		EnterRule(_localctx, 38, RULE_def_t_typ);
 		try {
-			State = 190;
+			State = 234;
 			ErrorHandler.Sync(this);
-			switch ( Interpreter.AdaptivePredict(TokenStream,8,Context) ) {
+			switch ( Interpreter.AdaptivePredict(TokenStream,10,Context) ) {
 			case 1:
 				EnterOuterAlt(_localctx, 1);
 				{
-				State = 157;
-				Match(T__10);
-				State = 158;
+				State = 201;
+				Match(T__12);
+				State = 202;
 				_localctx.def_t_typ_0__2 = seplist_o__i__s__i__s_def_t_typ_p_(0);
-				State = 159;
-				Match(T__11);
+				State = 203;
+				Match(T__13);
 				 _localctx.result =  (Ty) select<Ty>((bool) (bool) notSingular<Ty>((System.Collections.Generic.List<Ty>) _localctx.def_t_typ_0__2.result), (Ty) (Ty) TyTuple((System.Collections.Generic.List<Ty>) _localctx.def_t_typ_0__2.result), (Ty) (Ty) TyList((Ty) (Ty) firstElt<Ty>((System.Collections.Generic.List<Ty>) _localctx.def_t_typ_0__2.result)));
 				            
 				}
@@ -1230,16 +1537,16 @@ public partial class DTSchemaParser : Parser {
 			case 2:
 				EnterOuterAlt(_localctx, 2);
 				{
-				State = 162;
-				Match(T__12);
-				State = 163;
+				State = 206;
+				Match(T__14);
+				State = 207;
 				_localctx.def_t_typ_1__2 = def_t_typ();
-				State = 164;
-				Match(T__3);
-				State = 165;
+				State = 208;
+				Match(T__6);
+				State = 209;
 				_localctx.def_t_typ_1__4 = def_t_typ();
-				State = 166;
-				Match(T__13);
+				State = 210;
+				Match(T__15);
 				 _localctx.result =  (Ty) TyMap((Ty) _localctx.def_t_typ_1__2.result, (Ty) _localctx.def_t_typ_1__4.result);
 				            
 				}
@@ -1247,56 +1554,63 @@ public partial class DTSchemaParser : Parser {
 			case 3:
 				EnterOuterAlt(_localctx, 3);
 				{
-				State = 169;
-				Match(T__12);
-				State = 170;
-				_localctx.def_t_typ_2__2 = seplist_o__i__s__i__s_def_t_typ_p_(0);
-				State = 171;
-				Match(T__13);
-				 _localctx.result =  (Ty) TyTuple((System.Collections.Generic.List<Ty>) _localctx.def_t_typ_2__2.result);
+				State = 213;
+				_localctx.def_t_typ_2__1 = Match(IDENTIFIER);
+				 _localctx.result =  (Ty) TyNamed((string) (string) lexeme((IToken) _localctx.def_t_typ_2__1));
 				            
 				}
 				break;
 			case 4:
 				EnterOuterAlt(_localctx, 4);
 				{
-				State = 174;
-				_localctx.def_t_typ_3__1 = Match(IDENTIFIER);
-				 _localctx.result =  (Ty) TyNamed((string) (string) lexeme((IToken) _localctx.def_t_typ_3__1));
+				State = 215;
+				Match(T__7);
+				State = 216;
+				Match(T__12);
+				State = 217;
+				_localctx.def_t_typ_3__3 = emptyseplist_o__i__s__i__s_field_p_();
+				State = 218;
+				Match(T__13);
+				State = 219;
+				Match(T__16);
+				State = 220;
+				_localctx.def_t_typ_3__6 = nullable_t_ret();
+				 _localctx.result =  (Ty) TyFn((System.Collections.Generic.List<Field>) _localctx.def_t_typ_3__3.result, (Ret) _localctx.def_t_typ_3__6.result);
 				            
 				}
 				break;
 			case 5:
 				EnterOuterAlt(_localctx, 5);
 				{
-				State = 176;
-				Match(T__4);
-				State = 177;
-				Match(T__10);
-				State = 178;
-				_localctx.def_t_typ_4__3 = seplist_o__i__s__i__s_field_p_(0);
-				State = 179;
-				Match(T__11);
-				State = 180;
-				Match(T__14);
-				State = 181;
-				_localctx.def_t_typ_4__6 = nullable_t_ret();
-				 _localctx.result =  (Ty) TyFn((System.Collections.Generic.List<Field>) _localctx.def_t_typ_4__3.result, (Ret) _localctx.def_t_typ_4__6.result);
+				State = 223;
+				Match(T__7);
+				State = 224;
+				Match(T__12);
+				State = 225;
+				_localctx.def_t_typ_4__3 = emptyseplist_o__i__s__i__s_field_p_();
+				State = 226;
+				Match(T__13);
+				 _localctx.result =  (Ty) TyFn((System.Collections.Generic.List<Field>) _localctx.def_t_typ_4__3.result, (Ret) (Ret) NoRet());
 				            
 				}
 				break;
 			case 6:
 				EnterOuterAlt(_localctx, 6);
 				{
-				State = 184;
-				Match(T__4);
-				State = 185;
-				Match(T__10);
-				State = 186;
-				_localctx.def_t_typ_5__3 = seplist_o__i__s__i__s_field_p_(0);
-				State = 187;
-				Match(T__11);
-				 _localctx.result =  (Ty) TyFn((System.Collections.Generic.List<Field>) _localctx.def_t_typ_5__3.result, (Ret) (Ret) NoRet());
+				State = 229;
+				Match(T__1);
+				State = 230;
+				_localctx.def_t_typ_5__2 = Match(IDENTIFIER);
+				 _localctx.result =  (Ty) TyEnum((string) (string) lexeme((IToken) _localctx.def_t_typ_5__2));
+				            
+				}
+				break;
+			case 7:
+				EnterOuterAlt(_localctx, 7);
+				{
+				State = 232;
+				Match(T__8);
+				 _localctx.result =  (Ty) TyJSON();
 				            
 				}
 				break;
@@ -1340,18 +1654,18 @@ public partial class DTSchemaParser : Parser {
 	[RuleVersion(0)]
 	public Nullable_t_retContext nullable_t_ret() {
 		Nullable_t_retContext _localctx = new Nullable_t_retContext(Context, State);
-		EnterRule(_localctx, 32, RULE_nullable_t_ret);
+		EnterRule(_localctx, 40, RULE_nullable_t_ret);
 		try {
-			State = 199;
+			State = 243;
 			ErrorHandler.Sync(this);
-			switch ( Interpreter.AdaptivePredict(TokenStream,9,Context) ) {
+			switch ( Interpreter.AdaptivePredict(TokenStream,11,Context) ) {
 			case 1:
 				EnterOuterAlt(_localctx, 1);
 				{
-				State = 192;
+				State = 236;
 				_localctx.nullable_t_ret_0__1 = def_t_typ();
-				State = 193;
-				Match(T__2);
+				State = 237;
+				Match(T__5);
 				 _localctx.result =  (Ret) HasRet((Ty) _localctx.nullable_t_ret_0__1.result, (bool) true);
 				            
 				}
@@ -1359,7 +1673,7 @@ public partial class DTSchemaParser : Parser {
 			case 2:
 				EnterOuterAlt(_localctx, 2);
 				{
-				State = 196;
+				State = 240;
 				_localctx.nullable_t_ret_1__1 = def_t_typ();
 				 _localctx.result =  (Ret) HasRet((Ty) _localctx.nullable_t_ret_1__1.result, (bool) false);
 				            
@@ -1381,9 +1695,10 @@ public partial class DTSchemaParser : Parser {
 	public override bool Sempred(RuleContext _localctx, int ruleIndex, int predIndex) {
 		switch (ruleIndex) {
 		case 1: return list_o_definition_p__sempred((List_o_definition_p_Context)_localctx, predIndex);
-		case 11: return list_o_constructor_p__sempred((List_o_constructor_p_Context)_localctx, predIndex);
-		case 13: return seplist_o__i__s__i__s_def_t_typ_p__sempred((Seplist_o__i__s__i__s_def_t_typ_p_Context)_localctx, predIndex);
-		case 14: return seplist_o__i__s__i__s_field_p__sempred((Seplist_o__i__s__i__s_field_p_Context)_localctx, predIndex);
+		case 5: return list_o_enum_t_case_p__sempred((List_o_enum_t_case_p_Context)_localctx, predIndex);
+		case 14: return list_o_constructor_p__sempred((List_o_constructor_p_Context)_localctx, predIndex);
+		case 16: return seplist_o__i__s__i__s_def_t_typ_p__sempred((Seplist_o__i__s__i__s_def_t_typ_p_Context)_localctx, predIndex);
+		case 17: return seplist_o__i__s__i__s_field_p__sempred((Seplist_o__i__s__i__s_field_p_Context)_localctx, predIndex);
 		}
 		return true;
 	}
@@ -1393,86 +1708,107 @@ public partial class DTSchemaParser : Parser {
 		}
 		return true;
 	}
-	private bool list_o_constructor_p__sempred(List_o_constructor_p_Context _localctx, int predIndex) {
+	private bool list_o_enum_t_case_p__sempred(List_o_enum_t_case_p_Context _localctx, int predIndex) {
 		switch (predIndex) {
 		case 1: return Precpred(Context, 2);
 		}
 		return true;
 	}
-	private bool seplist_o__i__s__i__s_def_t_typ_p__sempred(Seplist_o__i__s__i__s_def_t_typ_p_Context _localctx, int predIndex) {
+	private bool list_o_constructor_p__sempred(List_o_constructor_p_Context _localctx, int predIndex) {
 		switch (predIndex) {
 		case 2: return Precpred(Context, 2);
 		}
 		return true;
 	}
-	private bool seplist_o__i__s__i__s_field_p__sempred(Seplist_o__i__s__i__s_field_p_Context _localctx, int predIndex) {
+	private bool seplist_o__i__s__i__s_def_t_typ_p__sempred(Seplist_o__i__s__i__s_def_t_typ_p_Context _localctx, int predIndex) {
 		switch (predIndex) {
 		case 3: return Precpred(Context, 2);
 		}
 		return true;
 	}
+	private bool seplist_o__i__s__i__s_field_p__sempred(Seplist_o__i__s__i__s_field_p_Context _localctx, int predIndex) {
+		switch (predIndex) {
+		case 4: return Precpred(Context, 2);
+		}
+		return true;
+	}
 
 	private static int[] _serializedATN = {
-		4,1,18,202,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,6,2,7,
+		4,1,20,246,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,6,2,7,
 		7,7,2,8,7,8,2,9,7,9,2,10,7,10,2,11,7,11,2,12,7,12,2,13,7,13,2,14,7,14,
-		2,15,7,15,2,16,7,16,1,0,1,0,1,0,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,5,
-		1,47,8,1,10,1,12,1,50,9,1,1,2,1,2,1,2,1,3,1,3,1,3,1,3,1,3,1,3,1,3,1,3,
-		1,3,3,3,64,8,3,1,4,1,4,1,4,1,4,1,4,1,5,1,5,1,5,1,5,1,6,1,6,1,6,1,6,1,6,
-		3,6,80,8,6,1,7,1,7,1,7,1,7,1,7,1,7,1,7,1,7,3,7,90,8,7,1,8,1,8,1,8,1,8,
-		1,8,1,9,1,9,1,9,1,9,1,9,1,9,1,9,1,9,3,9,105,8,9,1,10,1,10,1,10,1,10,1,
-		11,1,11,1,11,1,11,1,11,1,11,1,11,1,11,5,11,119,8,11,10,11,12,11,122,9,
-		11,1,12,1,12,1,12,1,12,1,12,1,12,1,13,1,13,1,13,1,13,1,13,1,13,1,13,1,
-		13,1,13,5,13,139,8,13,10,13,12,13,142,9,13,1,14,1,14,1,14,1,14,1,14,1,
-		14,1,14,1,14,1,14,5,14,153,8,14,10,14,12,14,156,9,14,1,15,1,15,1,15,1,
-		15,1,15,1,15,1,15,1,15,1,15,1,15,1,15,1,15,1,15,1,15,1,15,1,15,1,15,1,
-		15,1,15,1,15,1,15,1,15,1,15,1,15,1,15,1,15,1,15,1,15,1,15,1,15,1,15,1,
-		15,1,15,3,15,191,8,15,1,16,1,16,1,16,1,16,1,16,1,16,1,16,3,16,200,8,16,
-		1,16,0,4,2,22,26,28,17,0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,0,
-		0,201,0,34,1,0,0,0,2,38,1,0,0,0,4,51,1,0,0,0,6,63,1,0,0,0,8,65,1,0,0,0,
-		10,70,1,0,0,0,12,79,1,0,0,0,14,89,1,0,0,0,16,91,1,0,0,0,18,104,1,0,0,0,
-		20,106,1,0,0,0,22,110,1,0,0,0,24,123,1,0,0,0,26,129,1,0,0,0,28,143,1,0,
-		0,0,30,190,1,0,0,0,32,199,1,0,0,0,34,35,3,4,2,0,35,36,5,0,0,1,36,37,6,
-		0,-1,0,37,1,1,0,0,0,38,39,6,1,-1,0,39,40,3,6,3,0,40,41,6,1,-1,0,41,48,
-		1,0,0,0,42,43,10,2,0,0,43,44,3,6,3,0,44,45,6,1,-1,0,45,47,1,0,0,0,46,42,
-		1,0,0,0,47,50,1,0,0,0,48,46,1,0,0,0,48,49,1,0,0,0,49,3,1,0,0,0,50,48,1,
-		0,0,0,51,52,3,2,1,0,52,53,6,2,-1,0,53,5,1,0,0,0,54,55,3,10,5,0,55,56,6,
-		3,-1,0,56,64,1,0,0,0,57,58,3,24,12,0,58,59,6,3,-1,0,59,64,1,0,0,0,60,61,
-		3,8,4,0,61,62,6,3,-1,0,62,64,1,0,0,0,63,54,1,0,0,0,63,57,1,0,0,0,63,60,
-		1,0,0,0,64,7,1,0,0,0,65,66,5,1,0,0,66,67,5,2,0,0,67,68,5,16,0,0,68,69,
-		6,4,-1,0,69,9,1,0,0,0,70,71,5,2,0,0,71,72,3,18,9,0,72,73,6,5,-1,0,73,11,
-		1,0,0,0,74,75,5,3,0,0,75,76,5,4,0,0,76,80,6,6,-1,0,77,78,5,4,0,0,78,80,
-		6,6,-1,0,79,74,1,0,0,0,79,77,1,0,0,0,80,13,1,0,0,0,81,82,5,16,0,0,82,90,
-		6,7,-1,0,83,84,5,5,0,0,84,90,6,7,-1,0,85,86,5,2,0,0,86,90,6,7,-1,0,87,
-		88,5,1,0,0,88,90,6,7,-1,0,89,81,1,0,0,0,89,83,1,0,0,0,89,85,1,0,0,0,89,
-		87,1,0,0,0,90,15,1,0,0,0,91,92,3,14,7,0,92,93,3,12,6,0,93,94,3,30,15,0,
-		94,95,6,8,-1,0,95,17,1,0,0,0,96,97,5,16,0,0,97,98,5,6,0,0,98,99,3,28,14,
-		0,99,100,5,7,0,0,100,101,6,9,-1,0,101,105,1,0,0,0,102,103,5,16,0,0,103,
-		105,6,9,-1,0,104,96,1,0,0,0,104,102,1,0,0,0,105,19,1,0,0,0,106,107,5,8,
-		0,0,107,108,3,18,9,0,108,109,6,10,-1,0,109,21,1,0,0,0,110,111,6,11,-1,
-		0,111,112,3,20,10,0,112,113,6,11,-1,0,113,120,1,0,0,0,114,115,10,2,0,0,
-		115,116,3,20,10,0,116,117,6,11,-1,0,117,119,1,0,0,0,118,114,1,0,0,0,119,
-		122,1,0,0,0,120,118,1,0,0,0,120,121,1,0,0,0,121,23,1,0,0,0,122,120,1,0,
-		0,0,123,124,5,2,0,0,124,125,5,16,0,0,125,126,5,9,0,0,126,127,3,22,11,0,
-		127,128,6,12,-1,0,128,25,1,0,0,0,129,130,6,13,-1,0,130,131,3,30,15,0,131,
-		132,6,13,-1,0,132,140,1,0,0,0,133,134,10,2,0,0,134,135,5,10,0,0,135,136,
-		3,30,15,0,136,137,6,13,-1,0,137,139,1,0,0,0,138,133,1,0,0,0,139,142,1,
-		0,0,0,140,138,1,0,0,0,140,141,1,0,0,0,141,27,1,0,0,0,142,140,1,0,0,0,143,
-		144,6,14,-1,0,144,145,3,16,8,0,145,146,6,14,-1,0,146,154,1,0,0,0,147,148,
-		10,2,0,0,148,149,5,10,0,0,149,150,3,16,8,0,150,151,6,14,-1,0,151,153,1,
-		0,0,0,152,147,1,0,0,0,153,156,1,0,0,0,154,152,1,0,0,0,154,155,1,0,0,0,
-		155,29,1,0,0,0,156,154,1,0,0,0,157,158,5,11,0,0,158,159,3,26,13,0,159,
-		160,5,12,0,0,160,161,6,15,-1,0,161,191,1,0,0,0,162,163,5,13,0,0,163,164,
-		3,30,15,0,164,165,5,4,0,0,165,166,3,30,15,0,166,167,5,14,0,0,167,168,6,
-		15,-1,0,168,191,1,0,0,0,169,170,5,13,0,0,170,171,3,26,13,0,171,172,5,14,
-		0,0,172,173,6,15,-1,0,173,191,1,0,0,0,174,175,5,16,0,0,175,191,6,15,-1,
-		0,176,177,5,5,0,0,177,178,5,11,0,0,178,179,3,28,14,0,179,180,5,12,0,0,
-		180,181,5,15,0,0,181,182,3,32,16,0,182,183,6,15,-1,0,183,191,1,0,0,0,184,
-		185,5,5,0,0,185,186,5,11,0,0,186,187,3,28,14,0,187,188,5,12,0,0,188,189,
-		6,15,-1,0,189,191,1,0,0,0,190,157,1,0,0,0,190,162,1,0,0,0,190,169,1,0,
-		0,0,190,174,1,0,0,0,190,176,1,0,0,0,190,184,1,0,0,0,191,31,1,0,0,0,192,
-		193,3,30,15,0,193,194,5,3,0,0,194,195,6,16,-1,0,195,200,1,0,0,0,196,197,
-		3,30,15,0,197,198,6,16,-1,0,198,200,1,0,0,0,199,192,1,0,0,0,199,196,1,
-		0,0,0,200,33,1,0,0,0,10,48,63,79,89,104,120,140,154,190,199
+		2,15,7,15,2,16,7,16,2,17,7,17,2,18,7,18,2,19,7,19,2,20,7,20,1,0,1,0,1,
+		0,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,5,1,55,8,1,10,1,12,1,58,9,1,1,2,
+		1,2,1,2,1,3,1,3,1,3,1,3,1,3,1,3,1,3,1,3,1,3,1,3,1,3,1,3,3,3,75,8,3,1,4,
+		1,4,1,4,1,4,1,5,1,5,1,5,1,5,1,5,1,5,1,5,1,5,5,5,89,8,5,10,5,12,5,92,9,
+		5,1,6,1,6,1,6,1,6,1,6,1,6,1,7,1,7,1,7,1,7,1,7,1,8,1,8,1,8,1,8,1,9,1,9,
+		1,9,1,9,1,9,3,9,114,8,9,1,10,1,10,1,10,1,10,1,10,1,10,1,10,1,10,1,10,1,
+		10,1,10,1,10,3,10,128,8,10,1,11,1,11,1,11,1,11,1,11,1,12,1,12,1,12,1,12,
+		1,12,1,12,1,12,1,12,3,12,143,8,12,1,13,1,13,1,13,1,13,1,14,1,14,1,14,1,
+		14,1,14,1,14,1,14,1,14,5,14,157,8,14,10,14,12,14,160,9,14,1,15,1,15,1,
+		15,1,15,1,15,1,15,1,16,1,16,1,16,1,16,1,16,1,16,1,16,1,16,1,16,5,16,177,
+		8,16,10,16,12,16,180,9,16,1,17,1,17,1,17,1,17,1,17,1,17,1,17,1,17,1,17,
+		5,17,191,8,17,10,17,12,17,194,9,17,1,18,1,18,1,18,1,18,3,18,200,8,18,1,
+		19,1,19,1,19,1,19,1,19,1,19,1,19,1,19,1,19,1,19,1,19,1,19,1,19,1,19,1,
+		19,1,19,1,19,1,19,1,19,1,19,1,19,1,19,1,19,1,19,1,19,1,19,1,19,1,19,1,
+		19,1,19,1,19,1,19,1,19,3,19,235,8,19,1,20,1,20,1,20,1,20,1,20,1,20,1,20,
+		3,20,244,8,20,1,20,0,5,2,10,28,32,34,21,0,2,4,6,8,10,12,14,16,18,20,22,
+		24,26,28,30,32,34,36,38,40,0,0,247,0,42,1,0,0,0,2,46,1,0,0,0,4,59,1,0,
+		0,0,6,74,1,0,0,0,8,76,1,0,0,0,10,80,1,0,0,0,12,93,1,0,0,0,14,99,1,0,0,
+		0,16,104,1,0,0,0,18,113,1,0,0,0,20,127,1,0,0,0,22,129,1,0,0,0,24,142,1,
+		0,0,0,26,144,1,0,0,0,28,148,1,0,0,0,30,161,1,0,0,0,32,167,1,0,0,0,34,181,
+		1,0,0,0,36,199,1,0,0,0,38,234,1,0,0,0,40,243,1,0,0,0,42,43,3,4,2,0,43,
+		44,5,0,0,1,44,45,6,0,-1,0,45,1,1,0,0,0,46,47,6,1,-1,0,47,48,3,6,3,0,48,
+		49,6,1,-1,0,49,56,1,0,0,0,50,51,10,2,0,0,51,52,3,6,3,0,52,53,6,1,-1,0,
+		53,55,1,0,0,0,54,50,1,0,0,0,55,58,1,0,0,0,56,54,1,0,0,0,56,57,1,0,0,0,
+		57,3,1,0,0,0,58,56,1,0,0,0,59,60,3,2,1,0,60,61,6,2,-1,0,61,5,1,0,0,0,62,
+		63,3,16,8,0,63,64,6,3,-1,0,64,75,1,0,0,0,65,66,3,30,15,0,66,67,6,3,-1,
+		0,67,75,1,0,0,0,68,69,3,14,7,0,69,70,6,3,-1,0,70,75,1,0,0,0,71,72,3,12,
+		6,0,72,73,6,3,-1,0,73,75,1,0,0,0,74,62,1,0,0,0,74,65,1,0,0,0,74,68,1,0,
+		0,0,74,71,1,0,0,0,75,7,1,0,0,0,76,77,5,1,0,0,77,78,5,18,0,0,78,79,6,4,
+		-1,0,79,9,1,0,0,0,80,81,6,5,-1,0,81,82,3,8,4,0,82,83,6,5,-1,0,83,90,1,
+		0,0,0,84,85,10,2,0,0,85,86,3,8,4,0,86,87,6,5,-1,0,87,89,1,0,0,0,88,84,
+		1,0,0,0,89,92,1,0,0,0,90,88,1,0,0,0,90,91,1,0,0,0,91,11,1,0,0,0,92,90,
+		1,0,0,0,93,94,5,2,0,0,94,95,5,18,0,0,95,96,5,3,0,0,96,97,3,10,5,0,97,98,
+		6,6,-1,0,98,13,1,0,0,0,99,100,5,4,0,0,100,101,5,5,0,0,101,102,5,18,0,0,
+		102,103,6,7,-1,0,103,15,1,0,0,0,104,105,5,5,0,0,105,106,3,24,12,0,106,
+		107,6,8,-1,0,107,17,1,0,0,0,108,109,5,6,0,0,109,110,5,7,0,0,110,114,6,
+		9,-1,0,111,112,5,7,0,0,112,114,6,9,-1,0,113,108,1,0,0,0,113,111,1,0,0,
+		0,114,19,1,0,0,0,115,116,5,18,0,0,116,128,6,10,-1,0,117,118,5,8,0,0,118,
+		128,6,10,-1,0,119,120,5,5,0,0,120,128,6,10,-1,0,121,122,5,4,0,0,122,128,
+		6,10,-1,0,123,124,5,2,0,0,124,128,6,10,-1,0,125,126,5,9,0,0,126,128,6,
+		10,-1,0,127,115,1,0,0,0,127,117,1,0,0,0,127,119,1,0,0,0,127,121,1,0,0,
+		0,127,123,1,0,0,0,127,125,1,0,0,0,128,21,1,0,0,0,129,130,3,20,10,0,130,
+		131,3,18,9,0,131,132,3,38,19,0,132,133,6,11,-1,0,133,23,1,0,0,0,134,135,
+		5,18,0,0,135,136,5,10,0,0,136,137,3,34,17,0,137,138,5,11,0,0,138,139,6,
+		12,-1,0,139,143,1,0,0,0,140,141,5,18,0,0,141,143,6,12,-1,0,142,134,1,0,
+		0,0,142,140,1,0,0,0,143,25,1,0,0,0,144,145,5,1,0,0,145,146,3,24,12,0,146,
+		147,6,13,-1,0,147,27,1,0,0,0,148,149,6,14,-1,0,149,150,3,26,13,0,150,151,
+		6,14,-1,0,151,158,1,0,0,0,152,153,10,2,0,0,153,154,3,26,13,0,154,155,6,
+		14,-1,0,155,157,1,0,0,0,156,152,1,0,0,0,157,160,1,0,0,0,158,156,1,0,0,
+		0,158,159,1,0,0,0,159,29,1,0,0,0,160,158,1,0,0,0,161,162,5,5,0,0,162,163,
+		5,18,0,0,163,164,5,3,0,0,164,165,3,28,14,0,165,166,6,15,-1,0,166,31,1,
+		0,0,0,167,168,6,16,-1,0,168,169,3,38,19,0,169,170,6,16,-1,0,170,178,1,
+		0,0,0,171,172,10,2,0,0,172,173,5,12,0,0,173,174,3,38,19,0,174,175,6,16,
+		-1,0,175,177,1,0,0,0,176,171,1,0,0,0,177,180,1,0,0,0,178,176,1,0,0,0,178,
+		179,1,0,0,0,179,33,1,0,0,0,180,178,1,0,0,0,181,182,6,17,-1,0,182,183,3,
+		22,11,0,183,184,6,17,-1,0,184,192,1,0,0,0,185,186,10,2,0,0,186,187,5,12,
+		0,0,187,188,3,22,11,0,188,189,6,17,-1,0,189,191,1,0,0,0,190,185,1,0,0,
+		0,191,194,1,0,0,0,192,190,1,0,0,0,192,193,1,0,0,0,193,35,1,0,0,0,194,192,
+		1,0,0,0,195,196,3,34,17,0,196,197,6,18,-1,0,197,200,1,0,0,0,198,200,6,
+		18,-1,0,199,195,1,0,0,0,199,198,1,0,0,0,200,37,1,0,0,0,201,202,5,13,0,
+		0,202,203,3,32,16,0,203,204,5,14,0,0,204,205,6,19,-1,0,205,235,1,0,0,0,
+		206,207,5,15,0,0,207,208,3,38,19,0,208,209,5,7,0,0,209,210,3,38,19,0,210,
+		211,5,16,0,0,211,212,6,19,-1,0,212,235,1,0,0,0,213,214,5,18,0,0,214,235,
+		6,19,-1,0,215,216,5,8,0,0,216,217,5,13,0,0,217,218,3,36,18,0,218,219,5,
+		14,0,0,219,220,5,17,0,0,220,221,3,40,20,0,221,222,6,19,-1,0,222,235,1,
+		0,0,0,223,224,5,8,0,0,224,225,5,13,0,0,225,226,3,36,18,0,226,227,5,14,
+		0,0,227,228,6,19,-1,0,228,235,1,0,0,0,229,230,5,2,0,0,230,231,5,18,0,0,
+		231,235,6,19,-1,0,232,233,5,9,0,0,233,235,6,19,-1,0,234,201,1,0,0,0,234,
+		206,1,0,0,0,234,213,1,0,0,0,234,215,1,0,0,0,234,223,1,0,0,0,234,229,1,
+		0,0,0,234,232,1,0,0,0,235,39,1,0,0,0,236,237,3,38,19,0,237,238,5,6,0,0,
+		238,239,6,20,-1,0,239,244,1,0,0,0,240,241,3,38,19,0,241,242,6,20,-1,0,
+		242,244,1,0,0,0,243,236,1,0,0,0,243,240,1,0,0,0,244,41,1,0,0,0,12,56,74,
+		90,113,127,142,158,178,192,199,234,243
 	};
 
 	public static readonly ATN _ATN =

@@ -10,7 +10,7 @@ public static class EntryPoint
 
     enum Backend
     {
-        dart, python, julia, csharp
+        dart, python, julia, csharp, typescript
     }
 
     class Options
@@ -18,7 +18,7 @@ public static class EntryPoint
         public string File = "main.dts";
         public string? Out = null;
         public Backend Backend = Backend.dart;
-        public string OutputModule = "module";
+        public string? Required;
 
     }
 
@@ -27,26 +27,18 @@ public static class EntryPoint
         CmdParser<Options> parser = new();
         parser.Positional("File", (Options o, string v) => o.File = v);
         parser.Positional("Output", (Options o, string v) => o.Out = v);
-        parser.Named("module", (Options o, string v) => o.OutputModule = v);
+        parser.Named("require", (Options o, string v) => o.Required = v);
 
         parser.Named("backend", (Options o, string v) => {
-            switch (v.ToLowerInvariant())
+            o.Backend = v.ToLowerInvariant() switch
             {
-                case "dart":
-                    o.Backend = Backend.dart;
-                    break;
-                case "python":
-                    o.Backend = Backend.python;
-                    break;
-                case "julia":
-                    o.Backend = Backend.julia;
-                    break;
-                case "csharp":
-                    o.Backend = Backend.csharp;
-                    break;
-                default:
-                    throw new Exception($"Unknown backend {v}");
-            }
+                "dart" => Backend.dart,
+                "python" => Backend.python,
+                "julia" => Backend.julia,
+                "csharp" => Backend.csharp,
+                "typescript" or "ts" => Backend.typescript,
+                _ => throw new Exception($"Unknown backend {v}"),
+            };
         });
 
         var options = parser.Parse(argv);
@@ -58,13 +50,22 @@ public static class EntryPoint
         typeStore.Load(defs);
 
         var outputFile = options.Out ?? "out";
+        var require = options.Required ?? System.IO.Path.GetFileNameWithoutExtension(options.File) + "_require";
         switch (options.Backend)
         {
             case Backend.dart:
-                var dartBe = new DTSchema.Compiler.Backends.DartHost(typeStore, options.OutputModule);
+                var dartBe = new Compiler.Backends.Dart(typeStore, require);
                 System.IO.File.WriteAllText(
                     outputFile,
                     dartBe.CodeGen(typeStore),
+                    Encoding.UTF8
+                );
+                break;
+            case Backend.typescript:
+                var tsBe = new Compiler.Backends.TypeScript(typeStore, require);
+                System.IO.File.WriteAllText(
+                    outputFile,
+                    tsBe.CodeGen(typeStore),
                     Encoding.UTF8
                 );
                 break;

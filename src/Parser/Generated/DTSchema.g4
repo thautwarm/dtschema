@@ -29,9 +29,17 @@ public static Ty TyList (Ty elt)
 {
     return (Ty) new TyList(elt);
 }
+public static Ty TyJSON ()
+{
+    return (Ty) new TyJSON();
+}
 public static Ty TyFn (System.Collections.Generic.List<Field> args,Ret ret)
 {
     return (Ty) new TyFn(args,ret);
+}
+public static Ty TyEnum (string name)
+{
+    return (Ty) new TyEnum(name);
 }
 public static Ret NoRet ()
 {
@@ -53,6 +61,10 @@ public static Def DefExtern (Pos pos,string name)
 {
     return (Def) new DefExtern(pos,name);
 }
+public static Def DefEnum (Pos pos,string name,System.Collections.Generic.List<string> cases)
+{
+    return (Def) new DefEnum(pos,name,cases);
+}
 }
 start returns [System.Collections.Generic.List<Def> result]: v=start__y_ EOF { $result = _localctx.v.result; };
 list_o_definition_p_ returns [System.Collections.Generic.List<Def> result]
@@ -71,6 +83,22 @@ definition returns [Def result]
 | definition_1__1=def_t_sort { $result = _localctx.definition_1__1.result;
             }
 | definition_2__1=def_t_extern { $result = _localctx.definition_2__1.result;
+            }
+| definition_3__1=def_t_enum { $result = _localctx.definition_3__1.result;
+            }
+;
+enum_t_case returns [string result]
+: '|' enum_t_case_0__2=IDENTIFIER { $result = (string) lexeme((IToken) _localctx.enum_t_case_0__2);
+            }
+;
+list_o_enum_t_case_p_ returns [System.Collections.Generic.List<string> result]
+: list_o_enum_t_case_p__0__1=list_o_enum_t_case_p_ list_o_enum_t_case_p__0__2=enum_t_case { $result = (System.Collections.Generic.List<string>) appendList<string>((System.Collections.Generic.List<string>) _localctx.list_o_enum_t_case_p__0__1.result, (string) _localctx.list_o_enum_t_case_p__0__2.result);
+            }
+| list_o_enum_t_case_p__1__1=enum_t_case { $result = new System.Collections.Generic.List<string> { _localctx.list_o_enum_t_case_p__1__1.result };
+            }
+;
+def_t_enum returns [Def result]
+: def_t_enum_0__1='enum' def_t_enum_0__2=IDENTIFIER '=' def_t_enum_0__4=list_o_enum_t_case_p_ { $result = (Def) DefEnum((Pos) (Pos) getPos((IToken) _localctx.def_t_enum_0__1), (string) (string) lexeme((IToken) _localctx.def_t_enum_0__2), (System.Collections.Generic.List<string>) _localctx.def_t_enum_0__4.result);
             }
 ;
 def_t_extern returns [Def result]
@@ -95,6 +123,10 @@ fieldname returns [string result]
 | 'type' { $result = "type";
             }
 | 'extern' { $result = "extern";
+            }
+| 'enum' { $result = "enum";
+            }
+| 'json' { $result = "json";
             }
 ;
 field returns [Field result]
@@ -133,18 +165,26 @@ seplist_o__i__s__i__s_field_p_ returns [System.Collections.Generic.List<Field> r
 | seplist_o__i__s__i__s_field_p__1__1=field { $result = new System.Collections.Generic.List<Field> { _localctx.seplist_o__i__s__i__s_field_p__1__1.result };
             }
 ;
+emptyseplist_o__i__s__i__s_field_p_ returns [System.Collections.Generic.List<Field> result]
+: emptyseplist_o__i__s__i__s_field_p__0__1=seplist_o__i__s__i__s_field_p_ { $result = _localctx.emptyseplist_o__i__s__i__s_field_p__0__1.result;
+            }
+|  { $result = new System.Collections.Generic.List<Field> {  };
+            }
+;
 def_t_typ returns [Ty result]
 : '[' def_t_typ_0__2=seplist_o__i__s__i__s_def_t_typ_p_ ']' { $result = (Ty) select<Ty>((bool) (bool) notSingular<Ty>((System.Collections.Generic.List<Ty>) _localctx.def_t_typ_0__2.result), (Ty) (Ty) TyTuple((System.Collections.Generic.List<Ty>) _localctx.def_t_typ_0__2.result), (Ty) (Ty) TyList((Ty) (Ty) firstElt<Ty>((System.Collections.Generic.List<Ty>) _localctx.def_t_typ_0__2.result)));
             }
 | '{' def_t_typ_1__2=def_t_typ ':' def_t_typ_1__4=def_t_typ '}' { $result = (Ty) TyMap((Ty) _localctx.def_t_typ_1__2.result, (Ty) _localctx.def_t_typ_1__4.result);
             }
-| '{' def_t_typ_2__2=seplist_o__i__s__i__s_def_t_typ_p_ '}' { $result = (Ty) TyTuple((System.Collections.Generic.List<Ty>) _localctx.def_t_typ_2__2.result);
+| def_t_typ_2__1=IDENTIFIER { $result = (Ty) TyNamed((string) (string) lexeme((IToken) _localctx.def_t_typ_2__1));
             }
-| def_t_typ_3__1=IDENTIFIER { $result = (Ty) TyNamed((string) (string) lexeme((IToken) _localctx.def_t_typ_3__1));
+| 'fn' '[' def_t_typ_3__3=emptyseplist_o__i__s__i__s_field_p_ ']' '=>' def_t_typ_3__6=nullable_t_ret { $result = (Ty) TyFn((System.Collections.Generic.List<Field>) _localctx.def_t_typ_3__3.result, (Ret) _localctx.def_t_typ_3__6.result);
             }
-| 'fn' '[' def_t_typ_4__3=seplist_o__i__s__i__s_field_p_ ']' '=>' def_t_typ_4__6=nullable_t_ret { $result = (Ty) TyFn((System.Collections.Generic.List<Field>) _localctx.def_t_typ_4__3.result, (Ret) _localctx.def_t_typ_4__6.result);
+| 'fn' '[' def_t_typ_4__3=emptyseplist_o__i__s__i__s_field_p_ ']' { $result = (Ty) TyFn((System.Collections.Generic.List<Field>) _localctx.def_t_typ_4__3.result, (Ret) (Ret) NoRet());
             }
-| 'fn' '[' def_t_typ_5__3=seplist_o__i__s__i__s_field_p_ ']' { $result = (Ty) TyFn((System.Collections.Generic.List<Field>) _localctx.def_t_typ_5__3.result, (Ret) (Ret) NoRet());
+| 'enum' def_t_typ_5__2=IDENTIFIER { $result = (Ty) TyEnum((string) (string) lexeme((IToken) _localctx.def_t_typ_5__2));
+            }
+| 'json' { $result = (Ty) TyJSON();
             }
 ;
 nullable_t_ret returns [Ret result]

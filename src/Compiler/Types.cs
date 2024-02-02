@@ -6,9 +6,10 @@ using System.Linq;
 namespace DTSchema.Compiler;
 
 public abstract record class TypeDef(string Name);
-public record class TypeDefStruct(string Name, List<Field> fields) : TypeDef(Name);
+public record class TypeDefStruct(string Name, List<Field> Fields) : TypeDef(Name);
 public record class TypeDefVariant(string Name, List<(string Tag, List<Field> fields)> Cases) : TypeDef(Name);
 public record class TypeDefExtern(string Name) : TypeDef(Name);
+public record class TypeDefEnum(string Name, List<string> Cases) : TypeDef(Name);
 
 abstract record class TKey;
 
@@ -36,6 +37,10 @@ public class TypeStore
     {
         switch (t)
         {
+            case TyJSON _:
+                return ":json";
+            case TyEnum @enum:
+                return "enum:" + @enum.name;
             case TyNamed named:
                 return "@" + named.name;
             case TyMap map:
@@ -59,6 +64,12 @@ public class TypeStore
     {
         switch (definition)
         {
+            case DefEnum defEnum:
+                {
+                    if (DeclaredTypes.TryGetValue(defEnum.name, out var _)) return;
+                    DeclaredTypes.Add(defEnum.name, new TypeDefEnum(defEnum.name, defEnum.cases));
+                    break;
+                }
             case DefSort defSort:
                 {
                     if (DeclaredTypes.TryGetValue(defSort.sort.name, out var existing)) return;
@@ -128,9 +139,9 @@ public class TypeStore
                     {
                         if (existing is TypeDefStruct typeDefStruct)
                         {
-                            if (typeDefStruct.fields.Count == 0)
+                            if (typeDefStruct.Fields.Count == 0)
                             {
-                                typeDefStruct.fields.AddRange(defRecord.ctor.fields);
+                                typeDefStruct.Fields.AddRange(defRecord.ctor.fields);
                             }
                             else
                             {
@@ -148,6 +159,7 @@ public class TypeStore
                     }
                     break;
                 }
+            case DefEnum _:
             case DefExtern _:
                 break;
         }

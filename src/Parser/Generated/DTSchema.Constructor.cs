@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System;
 namespace DTSchema{
 public partial interface Def {  }
+public partial record DefEnum(Pos pos,string name,System.Collections.Generic.List<string> cases) : Def;
 public partial record DefExtern(Pos pos,string name) : Def;
 public partial record DefRecord(Pos pos,Ctor ctor) : Def;
 public partial record DefSort(Pos pos,Sort sort) : Def;
@@ -10,7 +11,9 @@ public partial interface Ret {  }
 public partial record HasRet(Ty ret,bool nullable) : Ret;
 public partial record NoRet() : Ret;
 public partial interface Ty {  }
+public partial record TyEnum(string name) : Ty;
 public partial record TyFn(System.Collections.Generic.List<Field> args,Ret ret) : Ty;
+public partial record TyJSON() : Ty;
 public partial record TyList(Ty elt) : Ty;
 public partial record TyMap(Ty key,Ty value) : Ty;
 public partial record TyNamed(string name) : Ty;
