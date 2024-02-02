@@ -9,7 +9,7 @@ Serializing/deserializing functions are supported for specific application archi
 This project was created to rule out the huge workloads of serialization/deserialization support in developing SDUI based on Flutter, QT or any other UI framework.
 
 <p align="center">
-<img width="350px" src="https://raw.githubusercontent.com/thautwarm/dtschema/master/static/sdui.png"/>
+<img width="600px" src="https://raw.githubusercontent.com/thautwarm/dtschema/master/static/sdui.png"/>
 </p>
 
 
