@@ -1,8 +1,11 @@
 from pmakefile import * # type: ignore
+from pmakefile import get_deps
 from scripts import utils
 import subprocess
 import config
 import shlex
+import glob
+
 
 try:
     shlex.split
@@ -40,3 +43,38 @@ def codegen_parser():
     cmds = shlex.split('antlr4 src/Parser/Generated/DTSchema.g4 -package DTSchema.Parser -o src/Parser/Generated')
     if code := subprocess.call(cmds):
         exit(code)
+
+
+@recipe(*[Path(each).as_posix() for each in glob.glob("src/**/*.cs", recursive=True)])
+def compile():
+    bflat = os.environ.get('BFLAT_EXE', "")
+    if not bflat:
+        bflat = shutil.which("bflat")
+        if bflat is None:
+            raise FileNotFoundError("bflat is not found in PATH")
+
+    deps = get_deps()
+    print(deps)
+
+    subprocess.call(['dotnet', 'build', '-c', 'Release'])
+
+    for operating_sys in ['linux', 'windows']:
+        for arch in ['x64', 'arm64']:
+            out = f'build/dtschema-{operating_sys}-{arch}'
+            if operating_sys == 'windows':
+                out += '.exe'
+            # windows
+            if code := subprocess.call([
+                bflat,
+                'build',
+                *deps,
+                '-r', 'bin/Release/net8.0/Antlr4.Runtime.Standard.dll',
+                '-o', out,
+                '--os', "windows",
+                '--arch', arch,
+                '-Os',
+                '--no-globalization',
+                '--separate-symbols',
+            ]):
+                exit(code)
+

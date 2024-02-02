@@ -4,6 +4,15 @@ A framework for serializing and deserializing data structures generically for mu
 
 Serializing/deserializing functions are supported for specific application architectures, e.g., server-driven UI (SDUI).
 
+## Usage
+
+```shell
+dtschema-windows-x64.exe [InputFile (.dts)] [OutputFile] --backend [dart|typescript|ts] --require file_that_provides_basic_ops
+
+# e.g., the following command generates a .ts file that imports & exports 'ops.ts'
+#    dtschema-linux-arm64 example.dts example.ts --backend ts --require ops
+```
+
 ## Motivation
 
 This project was created to rule out the huge workloads of serialization/deserialization support in developing SDUI based on Flutter, QT or any other UI framework.
