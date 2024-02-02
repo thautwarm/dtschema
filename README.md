@@ -28,8 +28,8 @@ This is a simplified example of that SDUI schema:
 type UI =
     | Touch(child: UI, onTap: fn [])
     | Text(value: str, style?: TextStyle)
-    | VStack(children: list<UI>)
-    | HStack(children: list<UI>)
+    | VStack(children: [UI])
+    | HStack(children: [UI])
     | FitBox(child: UI, fit?: enum Fit)
     | ...
 
