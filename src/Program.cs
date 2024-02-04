@@ -29,7 +29,7 @@ public static class EntryPoint
         Console.WriteLine("Options:");
         Console.WriteLine("  --help: Show this help message");
         Console.WriteLine("  --backend: The backend to use");
-        Console.WriteLine("             Possible values: dart, typescript");
+        Console.WriteLine("             Possible values: julia | dart | typescript | ts");
         Console.WriteLine("  --require: The name of the required module");
         Console.WriteLine("  <File>: The input .dts file");
         Console.WriteLine("  <Output>: The output file");
@@ -82,6 +82,14 @@ public static class EntryPoint
                 System.IO.File.WriteAllText(
                     outputFile,
                     tsBe.CodeGen(typeStore),
+                    Encoding.UTF8
+                );
+                break;
+            case Backend.julia:
+                var jlBe = new Compiler.Backends.Julia(typeStore, require);
+                System.IO.File.WriteAllText(
+                    outputFile,
+                    jlBe.CodeGen(typeStore),
                     Encoding.UTF8
                 );
                 break;

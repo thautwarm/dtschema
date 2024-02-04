@@ -2,14 +2,11 @@ using System.Collections.Generic;
 
 namespace DTSchema.Compiler;
 
-public abstract class Backend
+public abstract class Backend(TypeStore store)
 {
-    public readonly TypeStore Store;
+    public readonly TypeStore Store = store;
 
     protected readonly HashSet<string> AllGeneratedTypes = [];
-    public Backend(TypeStore store)
-    {
-        Store = store;
-    }
+
     public abstract string CodeGen(TypeStore store);
 }
