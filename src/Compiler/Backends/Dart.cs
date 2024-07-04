@@ -18,12 +18,8 @@ public sealed class Dart : Backend
     int unionTagIndex = 0;
     string unionSortName = "";
 
-    readonly string Required;
-
-    public Dart(TypeStore store, string required) : base(store)
+    public Dart(TypeStore store) : base(store)
     {
-        Required = required;
-
         foreach (var (k, v) in store.DeclaredTypes)
         {
             AllGeneratedTypes.Add(k);
@@ -51,8 +47,8 @@ public sealed class Dart : Backend
 
     void Predef()
     {
-        _ = P << $"import '{Required}';";
-        _ = P << $"export '{Required}';";
+        _ = P << $"import 'serde_support.dart';";
+        // _ = P << $"export '{Required}';";
         _ = P << "";
     }
 
@@ -93,12 +89,12 @@ public sealed class Dart : Backend
 
         // print the serialization impl
         {
-            _ = P << $"dynamic toJson(SerdeCtx ctx);";
+            _ = P << $"dynamic toJson();";
         }
 
         // print the deserialization impl
         {
-            _ = P << "static " + variant.Name + " fromJson(SerdeCtx ctx, dynamic json) {";
+            _ = P << "static " + variant.Name + " fromJson(dynamic json) {";
             ++P;
             // check if dict
             _ = P << "if (json is! Map<String, dynamic>) throw Exception(\""
@@ -176,14 +172,21 @@ public sealed class Dart : Backend
             }
 
             // print the dart constructor
-            _ = P << @struct.Name + "(";
+            _ = P << @struct.Name + "({";
             {
                 ++P;
                 foreach (var field in @struct.Fields)
                 {
-                    _ = P << "this." + field.name + ",";
+                    if (field.nullable)
+                    {
+                        _ = P << "this." + field.name + ",";
+                    }
+                    else
+                    {
+                        _ = P << "required this." + field.name + ",";
+                    }
                 }
-                _ = P << ");";
+                _ = P << "});";
                 --P;
             }
 
@@ -194,7 +197,7 @@ public sealed class Dart : Backend
                 _ = P << "@override";
             }
 
-            _ = P << $"dynamic toJson(SerdeCtx ctx) {{";
+            _ = P << $"dynamic toJson() {{";
             {
                 ++P;
                 _ = P << "return <String, dynamic>{";
@@ -217,7 +220,7 @@ public sealed class Dart : Backend
 
 
             // print the deserialization impl
-            _ = P << "static " + @struct.Name + " fromJson(SerdeCtx ctx, dynamic json) {";
+            _ = P << "static " + @struct.Name + " fromJson(dynamic json) {";
             {
                 ++P;
                 // check if dict
@@ -230,7 +233,7 @@ public sealed class Dart : Backend
                     ++P;
                     foreach (var field in @struct.Fields)
                     {
-                        _ = P << ShowDeserde(field.typ, "json[\"" + field.name + "\"]", field.nullable) + ",";
+                        _ = P << field.name + " : " + ShowDeserde(field.typ, "json[\"" + field.name + "\"]", field.nullable) + ",";
                     }
                     --P;
                 }
@@ -325,8 +328,8 @@ public sealed class Dart : Backend
                 );
             case TyNamed named:
                 if (AllGeneratedTypes.Contains(named.name))
-                    return string.Format("{0}.toJson(ctx)", expr);
-                return string.Format("Serde.{0}(ctx, {1})", named.name, expr);
+                    return string.Format("{0}.toJson()", expr);
+                return string.Format("Serde.{0}({1})", named.name, expr);
             case TyFn fn:
                 var tStr = ShowType(fn);
                 return string.Format("Serde.unsupported<{0}>(\"cannot serialize a function at HOST side\")", tStr);
@@ -380,29 +383,10 @@ public sealed class Dart : Backend
                 );
             case TyNamed named:
                 if (AllGeneratedTypes.Contains(named.name))
-                    return string.Format("{0}.fromJson(ctx, {1})", ShowType(named), expr);
-                return string.Format("Deserde.{0}(ctx, {1})", named.name, expr);
+                    return string.Format("{0}.fromJson({1})", ShowType(named), expr);
+                return string.Format("Deserde.{0}({1})", named.name, expr);
             case TyFn fn:
-
-                var argSig = string.Join(",", fn.args.Select(x => ShowType(x.typ) + (x.nullable ? "?" : "") + " " + x.name));
-                string fnBody;
-                var serializedData = "[" + string.Join(",", fn.args.Select(x => ShowSerde(x.typ, x.name, x.nullable))) + "]";
-                if (fn.ret is HasRet hasRet)
-                {
-                    var deserialized = ShowDeserde(hasRet.ret, "response", hasRet.nullable);
-                    fnBody = string.Format(
-                        "({0}) async {{ final response = await ctx.request(slot, {1}); return {2}; }}",
-                        argSig,
-                        serializedData,
-                        deserialized
-                    );
-                    return string.Format("Deserde.signal({0}, (slot) => {1})", expr, fnBody);
-                }
-                else
-                {
-                    fnBody = string.Format("({0}) async {{ await ctx.request(slot, {1}); }}", argSig, serializedData);
-                    return string.Format("Deserde.signal({0}, (slot) => {1})", expr, fnBody);
-                }
+                throw new System.NotImplementedException();
             default:
                 throw new UnreachableException();
         }

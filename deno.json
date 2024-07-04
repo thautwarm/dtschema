@@ -1,0 +1,6 @@
+{
+    "imports": {
+        "nomake": "https://raw.githubusercontent.com/thautwarm/nomake/v0.1.9/mod.ts",
+        "nomake-toolchain/zit": "https://raw.githubusercontent.com/nomake-toolchain/nomake-zit/v0.1.0/mod.ts"
+    }
+}

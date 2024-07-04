@@ -1,15 +1,24 @@
+/**
+*** Author: Taine Zhao (github.com/thautwarm)
+*** Date: 2023/06/14
+*** License: BSD 2-Clause "Simplified" License
+*** Description:
+***     This file provides a command-line parser for C#,
+***     bumping up the features of the regular Unix command-line parser.
+*/
 using System;
 using System.Collections.Generic;
 
-namespace SystemX.CommandLine;
+namespace SystemX.Cmd;
 
-public class CmdParser<T> where T : new()
+public partial class CmdParser<T> where T : new()
 {
     readonly List<string> PositionalArguments = new();
     string? PostionalVararg = null;
     readonly Dictionary<string, string> NamedArguments = new();
     readonly Dictionary<string, string> Flags = new();
-    readonly Dictionary<string, string> Shortcuts = new();
+    readonly Dictionary<string, string> ShortcutOptions = new();
+    readonly Dictionary<string, string> ShortcutFlags = new();
     public delegate void OptionHandler(T result, string Value);
     public delegate void VarargOptionHandler(T result, string[] Value);
     public delegate void FlagHandler(T result);
@@ -55,18 +64,25 @@ public class CmdParser<T> where T : new()
     public void Flag(string name, string storeName, FlagHandler f)
     {
         Flags[name] = storeName;
-
         m_FlagHandlers[storeName] = f;
     }
 
-    public void Shortcut(string name, string storeName, OptionHandler f)
+    public void ShortcutOption(string name, string storeName, OptionHandler f)
     {
-        Shortcuts[name] = storeName;
-
+        ShortcutOptions[name] = storeName;
         m_OptionHandlers[storeName] = f;
     }
 
-    public void Shortcut(string name, OptionHandler f) => Shortcut(name, name, f);
+    public void ShortcutOption(string name, OptionHandler f) => ShortcutOption(name, name, f);
+
+    public void ShortcutFlag(string name, string store, FlagHandler f)
+    {
+        ShortcutFlags[name] = store;
+        Flags[store] = store;
+        m_FlagHandlers[store] = f;
+    }
+
+    public void ShortcutFlag(string name, FlagHandler f) => ShortcutFlag(name, name, f);
 
     public void Flag(string name, FlagHandler f) => Flag(name, name, f);
 
@@ -126,7 +142,14 @@ public class CmdParser<T> where T : new()
             else if (arg.StartsWith("-"))
             {
                 var name = arg.Substring(1);
-                if (!Shortcuts.TryGetValue(name, out var storeName))
+                if (ShortcutFlags.TryGetValue(name, out var flagStoreName))
+                {
+                    m_FlagHandlers[flagStoreName](result);
+                    i += 1;
+                    continue;
+                }
+
+                if (!ShortcutOptions.TryGetValue(name, out var storeName))
                 {
                     Console.WriteLine("Unknown shortcut [{0}]", name);
                     i += 1;

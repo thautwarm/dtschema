@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 using DTSchema.Compiler;
-using SystemX.CommandLine;
+using SystemX.Cmd;
 
 namespace DTSchema;
 
@@ -28,9 +28,6 @@ public static class EntryPoint
         Console.WriteLine("Usage: dts [options] <File> <Output>");
         Console.WriteLine("Options:");
         Console.WriteLine("  --help: Show this help message");
-        Console.WriteLine("  --backend: The backend to use");
-        Console.WriteLine("             Possible values: julia | dart | typescript | ts");
-        Console.WriteLine("  --require: The name of the required module");
         Console.WriteLine("  <File>: The input .dts file");
         Console.WriteLine("  <Output>: The output file");
         Environment.Exit(0);
@@ -42,8 +39,6 @@ public static class EntryPoint
         parser.Flag("help", (Options o) => PrintHelp());
         parser.Positional("File", (Options o, string v) => o.File = v);
         parser.Positional("Output", (Options o, string v) => o.Out = v);
-        parser.Named("require", (Options o, string v) => o.Required = v);
-
         parser.Named("backend", (Options o, string v) =>
         {
             o.Backend = v.ToLowerInvariant() switch
@@ -66,30 +61,13 @@ public static class EntryPoint
         typeStore.Load(defs);
 
         var outputFile = options.Out ?? "out";
-        var require = options.Required ?? System.IO.Path.GetFileNameWithoutExtension(options.File) + "_require";
         switch (options.Backend)
         {
             case Backend.dart:
-                var dartBe = new Compiler.Backends.Dart(typeStore, require);
+                var dartBe = new Compiler.Backends.Dart(typeStore);
                 System.IO.File.WriteAllText(
                     outputFile,
                     dartBe.CodeGen(typeStore),
-                    Encoding.UTF8
-                );
-                break;
-            case Backend.typescript:
-                var tsBe = new Compiler.Backends.TypeScript(typeStore, require);
-                System.IO.File.WriteAllText(
-                    outputFile,
-                    tsBe.CodeGen(typeStore),
-                    Encoding.UTF8
-                );
-                break;
-            case Backend.julia:
-                var jlBe = new Compiler.Backends.Julia(typeStore, require);
-                System.IO.File.WriteAllText(
-                    outputFile,
-                    jlBe.CodeGen(typeStore),
                     Encoding.UTF8
                 );
                 break;

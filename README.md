@@ -30,7 +30,7 @@ type UI =
     | Text(value: str, style?: TextStyle)
     | VStack(children: [UI])
     | HStack(children: [UI])
-    | FitBox(child: UI, fit?: enum Fit)
+    | FittedBox(child: UI, fit?: enum Fit)
     | ...
 
 enum Fit =

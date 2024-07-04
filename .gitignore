@@ -1,5 +1,7 @@
 __pycache__/
 .pmake_caches/
+.nomake_files/
+dist/
 build/
 obj/
 bin/
@@ -8,3 +10,4 @@ tmp/
 *.g4
 *.interp
 *.tokens
+deno.lock
